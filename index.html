@@ -1,0 +1,3492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forest Quest — Your Cozy Life Adventure</title>
+  <style>
+/* ════════════════════════════════════════════════════
+   Forest Quest — Styles
+   Palette: sage green, dusty pink, cream, lavender, sky blue
+════════════════════════════════════════════════════ */
+
+/* ── TOKENS ── */
+:root {
+  --sage:       #8fad88;
+  --sage-light: #c4d9c1;
+  --sage-dark:  #5c8056;
+  --pink:       #e8b4b8;
+  --pink-light: #f5dde0;
+  --pink-dark:  #c77f85;
+  --cream:      #fdf8f2;
+  --cream-mid:  #f5eddf;
+  --lavender:   #c5b8e3;
+  --lav-light:  #ebe5f7;
+  --lav-dark:   #8f7bbf;
+  --sky:        #a8d4e6;
+  --sky-light:  #daeef7;
+  --sky-dark:   #5aabcf;
+  --gold:       #e8c97a;
+  --gold-light: #fdf1c7;
+  --danger:     #e07474;
+  --text-dark:  #3a3533;
+  --text-mid:   #6b6460;
+  --text-light: #9e9895;
+  --white:      #ffffff;
+  --shadow-sm:  0 2px 8px rgba(100,80,60,.09);
+  --shadow-md:  0 4px 20px rgba(100,80,60,.13);
+  --shadow-lg:  0 8px 40px rgba(100,80,60,.18);
+  --radius-sm:  10px;
+  --radius-md:  18px;
+  --radius-lg:  28px;
+  --sidebar-w:  220px;
+  --font-main:  'Quicksand', sans-serif;
+  --font-serif: 'Crimson Pro', Georgia, serif;
+  --transition: .22s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-main);
+  background: var(--cream);
+  color: var(--text-dark);
+  min-height: 100vh;
+  display: flex;
+  overflow-x: hidden;
+}
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+canvas { max-width: 100%; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--sage-light); border-radius: 10px; }
+
+/* ═══════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: linear-gradient(175deg, #e8f5e4 0%, #dce8f5 50%, #ece5f7 100%);
+  border-right: 1.5px solid var(--sage-light);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 100;
+  padding: 0 0 16px;
+  box-shadow: 2px 0 16px rgba(100,130,90,.08);
+  transition: transform var(--transition);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid rgba(143,173,136,.25);
+}
+.brand-icon { font-size: 1.8rem; }
+.brand-name {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--sage-dark);
+  letter-spacing: -.3px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: .95rem;
+  font-weight: 500;
+  color: var(--text-mid);
+  text-align: left;
+  transition: all var(--transition);
+  width: 100%;
+}
+.nav-btn:hover {
+  background: rgba(143,173,136,.18);
+  color: var(--sage-dark);
+  transform: translateX(3px);
+}
+.nav-btn.active {
+  background: var(--white);
+  color: var(--sage-dark);
+  box-shadow: var(--shadow-sm);
+  font-weight: 700;
+}
+.nav-icon { font-size: 1.15rem; }
+
+.sidebar-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  margin: 0 12px;
+  background: rgba(255,255,255,.6);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--cream-mid);
+}
+.player-avatar { font-size: 1.6rem; }
+.player-info { flex: 1; min-width: 0; }
+.player-name { font-weight: 700; font-size: .9rem; color: var(--text-dark); truncate: true; }
+.player-level { font-size: .8rem; color: var(--text-light); }
+.settings-btn { background: none; border: none; font-size: 1.1rem; opacity: .6; transition: opacity var(--transition); }
+.settings-btn:hover { opacity: 1; }
+
+/* ── MOBILE HEADER ── */
+.mobile-header {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: linear-gradient(90deg, #e8f5e4, #ece5f7);
+  border-bottom: 1.5px solid var(--sage-light);
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  z-index: 200;
+  box-shadow: var(--shadow-sm);
+}
+.hamburger { background: none; border: none; font-size: 1.4rem; color: var(--sage-dark); }
+.mobile-brand { font-family: var(--font-serif); font-weight: 600; color: var(--sage-dark); flex: 1; font-size: 1.1rem; }
+.mobile-coins { font-size: .95rem; font-weight: 600; color: var(--text-mid); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(60,50,40,.3);
+  z-index: 99;
+}
+
+/* ═══════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════ */
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  padding: 32px 36px;
+  min-height: 100vh;
+  background: 
+    radial-gradient(ellipse 80% 40% at 60% 10%, rgba(197,184,227,.18) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 30% at 10% 80%, rgba(168,212,230,.15) 0%, transparent 70%),
+    var(--cream);
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn .3s ease; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ── PAGE HEADERS ── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-title {
+  font-family: var(--font-serif);
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1.2;
+}
+.page-subtitle { font-size: .95rem; color: var(--text-light); margin-top: 4px; }
+
+/* ── CARDS ── */
+.card {
+  background: rgba(255,255,255,.85);
+  border: 1.5px solid rgba(200,190,180,.3);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* ═══════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: rgba(255,255,255,.9);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1.5px solid transparent;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.level-card { border-color: var(--gold); background: linear-gradient(135deg,#fff9ec,#fdf4d3); }
+.xp-card    { border-color: var(--lavender); background: linear-gradient(135deg,#f5f0ff,#ebe5f7); }
+.coins-card { border-color: var(--sage-light); background: linear-gradient(135deg,#f0f8ed,#e4f2e0); }
+.streak-card { border-color: var(--pink); background: linear-gradient(135deg,#fff0f2,#fde5e7); }
+.stat-icon { font-size: 2rem; }
+.stat-label { font-size: .78rem; color: var(--text-light); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.stat-value { font-size: 1.9rem; font-weight: 700; color: var(--text-dark); line-height: 1.1; }
+
+/* ── XP BAR ── */
+.xp-bar-section {
+  margin-bottom: 24px;
+  padding: 18px 24px;
+}
+.xp-bar-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text-mid);
+  margin-bottom: 10px;
+}
+.xp-bar-track {
+  height: 20px;
+  background: var(--cream-mid);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  border: 1.5px solid var(--sage-light);
+}
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sage) 0%, var(--lavender) 60%, var(--pink) 100%);
+  border-radius: 20px;
+  width: 0%;
+  transition: width 1s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  overflow: hidden;
+}
+.xp-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -60%; width: 50%; height: 100%;
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);
+  animation: shimmer 2.5s infinite;
+}
+@keyframes shimmer { 100% { left: 130%; } }
+
+/* ── DASHBOARD GRID ── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.todays-quests .today-list {
+  min-height: 120px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 14px;
+}
+
+.today-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+  border: 1.5px solid var(--cream-mid);
+  margin-bottom: 8px;
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.today-item:hover { border-color: var(--sage-light); background: var(--sky-light); }
+.today-item.done {
+  opacity: .65;
+  background: #f0faf0;
+  border-color: var(--sage-light);
+}
+.today-item.done .today-name { text-decoration: line-through; color: var(--text-light); }
+.today-check { font-size: 1.3rem; flex-shrink: 0; }
+.today-name { flex: 1; font-weight: 500; font-size: .92rem; }
+.today-reward { font-size: .8rem; color: var(--text-light); }
+.quest-count { font-size: .85rem; color: var(--sage-dark); font-weight: 600; background: var(--sage-light); padding: 3px 10px; border-radius: 20px; }
+
+/* ── STREAK CALENDAR ── */
+.streak-flame { font-size: .9rem; font-weight: 700; color: #e06730; }
+.streak-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .65rem;
+  font-weight: 600;
+  color: var(--text-light);
+  background: var(--cream-mid);
+  transition: all var(--transition);
+  position: relative;
+}
+.cal-day.active {
+  background: linear-gradient(135deg, var(--sage), var(--lavender));
+  color: white;
+  box-shadow: 0 2px 6px rgba(100,150,100,.3);
+}
+.cal-day.today-marker {
+  border: 2px solid var(--pink-dark);
+}
+.cal-day.partial {
+  background: var(--sage-light);
+  color: var(--sage-dark);
+}
+
+/* ── RECENT BADGES ── */
+.recent-badges-list {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.badge-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--lav-light);
+  border: 1.5px solid var(--lavender);
+  border-radius: 30px;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--lav-dark);
+  animation: popIn .3s cubic-bezier(.4,0,.2,1);
+}
+@keyframes popIn { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* ═══════════════════════════════════════
+   TASKS / QUESTS
+═══════════════════════════════════════ */
+.category-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.filter-btn {
+  padding: 7px 16px;
+  border: 1.5px solid var(--cream-mid);
+  background: var(--white);
+  border-radius: 20px;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text-mid);
+  transition: all var(--transition);
+}
+.filter-btn:hover { border-color: var(--sage); color: var(--sage-dark); }
+.filter-btn.active {
+  background: var(--sage);
+  border-color: var(--sage);
+  color: white;
+  box-shadow: 0 2px 8px rgba(143,173,136,.4);
+}
+
+.task-list { display: flex; flex-direction: column; gap: 10px; }
+
+.task-card {
+  background: rgba(255,255,255,.9);
+  border: 1.5px solid rgba(200,190,180,.25);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all var(--transition);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+.task-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--sage-light); }
+.task-card.completed-today {
+  border-left: 4px solid var(--sage);
+  background: linear-gradient(135deg,rgba(196,217,193,.15),rgba(255,255,255,.9));
+}
+
+.task-complete-btn {
+  width: 30px; height: 30px;
+  border: 2px solid var(--sage-light);
+  border-radius: 50%;
+  background: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+.task-complete-btn:hover { border-color: var(--sage); background: var(--sage-light); }
+.task-card.completed-today .task-complete-btn {
+  background: var(--sage);
+  border-color: var(--sage);
+  color: white;
+}
+
+.task-info { flex: 1; min-width: 0; }
+.task-name { font-weight: 600; font-size: .98rem; margin-bottom: 4px; }
+.task-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.task-cat { font-size: .75rem; padding: 2px 9px; border-radius: 12px; font-weight: 600; }
+.cat-Health     { background:#e0f5e0; color:#3a7a3a; }
+.cat-Learning   { background:#e0e8ff; color:#3a50a0; }
+.cat-Chores     { background:#fff0d8; color:#8a5a00; }
+.cat-Fitness    { background:#ffe0e0; color:#a03030; }
+.cat-Creativity { background:#f5e0ff; color:#7030a0; }
+.cat-Social     { background:#e0f5ff; color:#0060a0; }
+.cat-Mindfulness { background:#f0f0e0; color:#5a5a00; }
+.cat-Other      { background:#f0e8e0; color:#5a3a00; }
+
+.task-rewards { display: flex; gap: 8px; align-items: center; }
+.task-reward-badge { font-size: .78rem; color: var(--text-light); }
+.task-repeat-badge { font-size: .72rem; color: var(--text-light); border: 1px solid var(--cream-mid); border-radius: 8px; padding: 1px 7px; }
+
+.task-edit-btn { background: none; border: none; font-size: .9rem; opacity: .4; transition: opacity var(--transition); flex-shrink: 0; }
+.task-edit-btn:hover { opacity: 1; }
+
+/* ═══════════════════════════════════════
+   SHOP
+═══════════════════════════════════════ */
+.shop-header-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.coin-balance-display {
+  background: var(--gold-light);
+  border: 1.5px solid var(--gold);
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-weight: 700;
+  font-size: .95rem;
+  color: #7a5800;
+}
+
+.reward-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.reward-card {
+  background: rgba(255,255,255,.9);
+  border: 1.5px solid var(--cream-mid);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  transition: all var(--transition);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+.reward-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--gold); }
+
+.reward-icon-large { font-size: 3rem; line-height: 1; }
+.reward-name { font-weight: 700; font-size: 1rem; color: var(--text-dark); }
+.reward-desc-text { font-size: .82rem; color: var(--text-light); }
+.reward-cost-badge {
+  background: var(--gold-light);
+  border: 1.5px solid var(--gold);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-weight: 700;
+  font-size: .88rem;
+  color: #7a5800;
+}
+.reward-actions { display: flex; gap: 8px; width: 100%; justify-content: center; }
+.reward-edit-btn { background: none; border: none; font-size: .85rem; opacity: .4; position: absolute; top: 12px; right: 12px; transition: opacity var(--transition); }
+.reward-edit-btn:hover { opacity: 1; }
+
+.redemption-history { margin-top: 28px; }
+.redemption-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--cream-mid);
+  font-size: .9rem;
+}
+.redemption-item:last-child { border-bottom: none; }
+.redemption-icon { font-size: 1.4rem; }
+.redemption-info { flex: 1; }
+.redemption-name { font-weight: 600; }
+.redemption-date { font-size: .78rem; color: var(--text-light); }
+.redemption-cost { color: var(--text-light); font-weight: 600; }
+
+/* ═══════════════════════════════════════
+   FOREST
+═══════════════════════════════════════ */
+.forest-stats-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.forest-stat {
+  background: rgba(255,255,255,.8);
+  border: 1.5px solid var(--sage-light);
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-weight: 600;
+  color: var(--sage-dark);
+  font-size: .92rem;
+}
+
+.forest-scene {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  min-height: 380px;
+  background: linear-gradient(180deg,#c5e8f5 0%,#e0f4fa 40%,#a8d4a0 70%,#7ab872 100%);
+  margin-bottom: 24px;
+}
+.forest-sky {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 60%;
+}
+.forest-sun {
+  position: absolute;
+  top: 20px; right: 40px;
+  font-size: 2.8rem;
+  animation: sunFloat 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 16px rgba(255,220,80,.5));
+}
+@keyframes sunFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+.forest-clouds { position: absolute; top: 0; left: 0; right: 0; height: 100%; }
+.forest-cloud {
+  position: absolute;
+  font-size: 2rem;
+  opacity: .8;
+  animation: cloudDrift linear infinite;
+}
+.forest-ground {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 45%;
+  background: linear-gradient(180deg,#8dbe7e 0%,#6aaa60 40%,#4a8a40 100%);
+  border-radius: 100% 100% 0 0 / 30px 30px 0 0;
+}
+.forest-elements {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  top: 0;
+  pointer-events: none;
+}
+.forest-element {
+  position: absolute;
+  font-size: 2.5rem;
+  animation: elementSway 3s ease-in-out infinite;
+  transition: transform var(--transition);
+  display: inline-block;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.15));
+}
+@keyframes elementSway {
+  0%,100% { transform: rotate(-2deg) translateY(0); }
+  50% { transform: rotate(2deg) translateY(-4px); }
+}
+
+.forest-legend .legend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .88rem;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--cream-mid);
+  background: var(--cream);
+}
+.legend-item.unlocked { border-color: var(--sage-light); background: #f0faf0; }
+.legend-item.locked { opacity: .5; filter: grayscale(.7); }
+.legend-icon { font-size: 1.5rem; }
+.legend-label { flex: 1; font-weight: 600; color: var(--text-dark); }
+.legend-req { font-size: .75rem; color: var(--text-light); }
+
+/* ═══════════════════════════════════════
+   ACHIEVEMENTS
+═══════════════════════════════════════ */
+.achievements-progress {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding: 16px 24px;
+}
+.badges-progress-bar {
+  flex: 1;
+  height: 10px;
+  background: var(--cream-mid);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--lavender);
+}
+.badges-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--lavender), var(--pink));
+  border-radius: 10px;
+  transition: width .8s ease;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.achievement-card {
+  background: rgba(255,255,255,.9);
+  border: 2px solid var(--cream-mid);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+.achievement-card.unlocked {
+  border-color: var(--gold);
+  background: linear-gradient(135deg,#fffbed,#fff8d8);
+  box-shadow: 0 4px 16px rgba(232,201,122,.25);
+}
+.achievement-card.locked { filter: grayscale(.6); opacity: .7; }
+.achievement-badge-icon { font-size: 2.6rem; }
+.achievement-name { font-weight: 700; font-size: .95rem; color: var(--text-dark); }
+.achievement-desc { font-size: .8rem; color: var(--text-light); }
+.achievement-date { font-size: .75rem; color: var(--sage-dark); font-weight: 600; }
+.achievement-card.unlocked .achievement-badge-icon {
+  animation: badgeBounce .5s cubic-bezier(.4,0,.2,1);
+}
+@keyframes badgeBounce { 0%{transform:scale(1)} 40%{transform:scale(1.3)} 70%{transform:scale(.9)} 100%{transform:scale(1)} }
+
+/* ═══════════════════════════════════════
+   TRENDS
+═══════════════════════════════════════ */
+.trends-time-filter {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.chart-card { padding: 20px; }
+.chart-title {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+  color: var(--text-dark);
+}
+
+.trends-summary { }
+.trends-summary h3 {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 16px;
+}
+.summary-stat {
+  text-align: center;
+  padding: 16px;
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--cream-mid);
+}
+.summary-icon { font-size: 1.8rem; margin-bottom: 6px; }
+.summary-val { font-size: 1.6rem; font-weight: 700; color: var(--text-dark); }
+.summary-label { font-size: .78rem; color: var(--text-light); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-top: 4px; }
+
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: .9rem;
+  border: 2px solid transparent;
+  transition: all var(--transition);
+  text-decoration: none;
+  font-family: inherit;
+}
+.btn-primary {
+  background: var(--sage);
+  color: white;
+  border-color: var(--sage);
+}
+.btn-primary:hover { background: var(--sage-dark); border-color: var(--sage-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(92,128,86,.35); }
+.btn-accent {
+  background: linear-gradient(135deg, var(--pink-dark), var(--lavender));
+  color: white;
+  border-color: transparent;
+}
+.btn-accent:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(197,184,227,.4); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-mid);
+  border-color: var(--cream-mid);
+}
+.btn-ghost:hover { background: var(--cream-mid); color: var(--text-dark); }
+.btn-sm { padding: 6px 14px; font-size: .82rem; }
+
+.add-quest-quick {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════════
+   FORMS
+═══════════════════════════════════════ */
+.form-label { display: block; font-size: .85rem; font-weight: 600; color: var(--text-mid); margin-bottom: 6px; margin-top: 16px; }
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--cream-mid);
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+  font-size: .95rem;
+  color: var(--text-dark);
+  transition: border-color var(--transition);
+  outline: none;
+  resize: vertical;
+}
+.form-input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(143,173,136,.18); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; }
+
+/* ═══════════════════════════════════════
+   MODALS
+═══════════════════════════════════════ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(50,40,35,.45);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+  animation: fadeIn .15s ease;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--cream);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalSlide .22s cubic-bezier(.4,0,.2,1);
+  border: 1.5px solid rgba(200,190,180,.3);
+}
+.modal-sm { max-width: 360px; }
+@keyframes modalSlide { from{transform:scale(.95) translateY(10px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 0;
+  margin-bottom: 0;
+}
+.modal-header h2 {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--text-light);
+  padding: 4px;
+  border-radius: 6px;
+  transition: all var(--transition);
+}
+.modal-close:hover { color: var(--text-dark); background: var(--cream-mid); }
+
+.modal-body { padding: 8px 24px 16px; }
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px 22px;
+  border-top: 1px solid var(--cream-mid);
+  gap: 10px;
+}
+.modal-footer-right { display: flex; gap: 8px; margin-left: auto; }
+
+/* ═══════════════════════════════════════
+   AVATAR PICKER
+═══════════════════════════════════════ */
+.avatar-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 0;
+}
+.avatar-opt {
+  font-size: 1.8rem;
+  width: 50px; height: 50px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--cream-mid);
+  background: white;
+  transition: all var(--transition);
+  display: flex; align-items: center; justify-content: center;
+}
+.avatar-opt:hover { border-color: var(--sage); transform: scale(1.08); }
+.avatar-opt.selected { border-color: var(--sage); background: var(--sage-light); }
+
+.settings-danger-zone { margin-top: 24px; padding-top: 18px; border-top: 1px dashed var(--pink); }
+.settings-danger-zone h4 { font-size: .9rem; color: var(--text-light); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.danger-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.toast-container {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  background: rgba(255,255,255,.96);
+  border: 1.5px solid var(--sage-light);
+  border-radius: var(--radius-md);
+  padding: 13px 18px;
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: toastIn .3s cubic-bezier(.4,0,.2,1);
+  max-width: 320px;
+  pointer-events: all;
+  backdrop-filter: blur(8px);
+}
+.toast.toast-xp { border-color: var(--lavender); background: linear-gradient(135deg,#f5f0ff,rgba(255,255,255,.96)); }
+.toast.toast-coin { border-color: var(--gold); background: linear-gradient(135deg,#fffbed,rgba(255,255,255,.96)); }
+.toast.toast-error { border-color: var(--danger); }
+@keyframes toastIn { from{transform:translateY(20px) scale(.9);opacity:0} to{transform:none;opacity:1} }
+@keyframes toastOut { to{transform:translateX(110%);opacity:0} }
+.toast.removing { animation: toastOut .3s ease forwards; }
+
+/* ═══════════════════════════════════════
+   FANFARES
+═══════════════════════════════════════ */
+.achievement-fanfare,
+.levelup-fanfare {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(50,40,35,.5);
+  backdrop-filter: blur(6px);
+  animation: fadeIn .3s ease;
+}
+.fanfare-inner {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 44px 52px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  border: 2.5px solid var(--gold);
+  animation: fanfarePop .5s cubic-bezier(.4,0,.2,1);
+}
+@keyframes fanfarePop { 0%{transform:scale(.5) rotate(-5deg);opacity:0} 60%{transform:scale(1.06)} 100%{transform:scale(1) rotate(0);opacity:1} }
+.fanfare-icon { font-size: 4rem; margin-bottom: 10px; animation: fanfareIcon .6s .2s both; }
+@keyframes fanfareIcon { 0%{transform:scale(0) rotate(20deg)} 60%{transform:scale(1.2) rotate(-5deg)} 100%{transform:scale(1) rotate(0)} }
+.fanfare-title { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+.fanfare-name { font-size: 1.1rem; color: var(--sage-dark); font-weight: 700; }
+
+/* ── CONFETTI PARTICLES ── */
+.confetti-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 4000;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(-20px) rotate(0); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════
+   EMPTY STATES
+═══════════════════════════════════════ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 24px;
+  gap: 10px;
+}
+.empty-state.small { padding: 16px; }
+.empty-icon { font-size: 2.8rem; }
+.empty-state h3 { font-family: var(--font-serif); font-size: 1.2rem; color: var(--text-dark); }
+.empty-state p { font-size: .9rem; color: var(--text-light); max-width: 280px; }
+
+/* ── REDEEM MODAL ── */
+.redeem-icon { font-size: 4rem; margin: 10px 0; }
+.modal-body p { margin-top: 8px; font-size: .95rem; color: var(--text-mid); }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .charts-grid { grid-template-columns: 1fr; }
+  .summary-stats { grid-template-columns: repeat(2,1fr); }
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: 300;
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .sidebar-overlay.show { display: block; }
+  .mobile-header { display: flex; }
+  .main-content {
+    margin-left: 0;
+    padding: 80px 16px 24px;
+  }
+  .stats-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
+  .stat-card { padding: 14px; }
+  .stat-value { font-size: 1.5rem; }
+  .page-title { font-size: 1.5rem; }
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .shop-header-right { flex-direction: column; align-items: flex-start; }
+  .modal { max-height: 95vh; margin: 0 8px; }
+  .form-row { grid-template-columns: 1fr; }
+  .trends-time-filter { flex-wrap: wrap; }
+  .summary-stats { grid-template-columns: repeat(2,1fr); }
+  .toast-container { bottom: 16px; right: 16px; left: 16px; }
+  .forest-scene { min-height: 260px; }
+  .achievements-grid { grid-template-columns: repeat(2,1fr); }
+}
+
+/* ── ANIMATIONS & POLISH ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- ── SIDEBAR NAV ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">🌲</span>
+      <span class="brand-name">Forest Quest</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-btn active" data-tab="dashboard">
+        <span class="nav-icon">🏡</span><span>Home</span>
+      </button>
+      <button class="nav-btn" data-tab="tasks">
+        <span class="nav-icon">✨</span><span>Quests</span>
+      </button>
+      <button class="nav-btn" data-tab="shop">
+        <span class="nav-icon">🛍️</span><span>Rewards</span>
+      </button>
+      <button class="nav-btn" data-tab="forest">
+        <span class="nav-icon">🌿</span><span>My Forest</span>
+      </button>
+      <button class="nav-btn" data-tab="achievements">
+        <span class="nav-icon">🏅</span><span>Badges</span>
+      </button>
+      <button class="nav-btn" data-tab="trends">
+        <span class="nav-icon">📊</span><span>Trends</span>
+      </button>
+    </nav>
+    <div class="sidebar-player">
+      <div class="player-avatar" id="sidebarAvatar">🧝</div>
+      <div class="player-info">
+        <div class="player-name" id="sidebarName">Adventurer</div>
+        <div class="player-level">Level <span id="sidebarLevel">1</span></div>
+      </div>
+      <button class="settings-btn" id="openSettings" title="Settings">⚙️</button>
+    </div>
+  </aside>
+
+  <!-- ── MOBILE HEADER ── -->
+  <header class="mobile-header">
+    <button class="hamburger" id="hamburger">☰</button>
+    <span class="mobile-brand">🌲 Forest Quest</span>
+    <div class="mobile-coins">🪙 <span id="mobileCoins">0</span></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="main-content">
+
+    <!-- ═══════════════════ DASHBOARD ═══════════════════ -->
+    <section class="tab-panel active" id="tab-dashboard">
+      <div class="page-header">
+        <h1 class="page-title">Welcome back, <span id="greetName">Adventurer</span>! 🌸</h1>
+        <p class="page-subtitle" id="dateDisplay"></p>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-grid">
+        <div class="stat-card level-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-info">
+            <div class="stat-label">Level</div>
+            <div class="stat-value" id="dashLevel">1</div>
+          </div>
+        </div>
+        <div class="stat-card xp-card">
+          <div class="stat-icon">✨</div>
+          <div class="stat-info">
+            <div class="stat-label">Total XP</div>
+            <div class="stat-value" id="dashXP">0</div>
+          </div>
+        </div>
+        <div class="stat-card coins-card">
+          <div class="stat-icon">🪙</div>
+          <div class="stat-info">
+            <div class="stat-label">Coins</div>
+            <div class="stat-value" id="dashCoins">0</div>
+          </div>
+        </div>
+        <div class="stat-card streak-card">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-info">
+            <div class="stat-label">Day Streak</div>
+            <div class="stat-value" id="dashStreak">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- XP Progress Bar -->
+      <div class="xp-bar-section card">
+        <div class="xp-bar-header">
+          <span>Level <span id="xpBarLevel">1</span></span>
+          <span id="xpBarText">0 / 100 XP</span>
+          <span>Level <span id="xpBarNext">2</span></span>
+        </div>
+        <div class="xp-bar-track">
+          <div class="xp-bar-fill" id="xpBarFill"></div>
+          <div class="xp-bar-sparkle" id="xpSparkle"></div>
+        </div>
+      </div>
+
+      <!-- Today's Quests -->
+      <div class="dashboard-grid">
+        <div class="card todays-quests">
+          <div class="card-header">
+            <h2 class="card-title">Today's Quests</h2>
+            <span class="quest-count" id="todayCount">0 done</span>
+          </div>
+          <div class="today-list" id="todayList">
+            <div class="empty-state">
+              <div class="empty-icon">🌱</div>
+              <p>No quests yet! Head to Quests to add your first task.</p>
+            </div>
+          </div>
+          <button class="btn btn-primary add-quest-quick" id="quickAddBtn">+ Add a Quest</button>
+        </div>
+
+        <!-- Streak Calendar -->
+        <div class="card streak-calendar-card">
+          <div class="card-header">
+            <h2 class="card-title">Streak Calendar</h2>
+            <span class="streak-flame">🔥 <span id="calStreak">0</span> days</span>
+          </div>
+          <div class="streak-calendar" id="streakCalendar"></div>
+        </div>
+      </div>
+
+      <!-- Recent Achievements -->
+      <div class="card recent-achievements">
+        <div class="card-header">
+          <h2 class="card-title">Recent Badges</h2>
+          <button class="btn btn-ghost" data-tab-link="achievements">View All →</button>
+        </div>
+        <div class="recent-badges-list" id="recentBadges">
+          <div class="empty-state small">
+            <p>Complete quests to earn your first badge! 🏅</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ QUESTS (TASKS) ═══════════════════ -->
+    <section class="tab-panel" id="tab-tasks">
+      <div class="page-header">
+        <h1 class="page-title">Quests ✨</h1>
+        <button class="btn btn-primary" id="openAddTask">+ New Quest</button>
+      </div>
+
+      <!-- Category Filter -->
+      <div class="category-filter" id="categoryFilter">
+        <button class="filter-btn active" data-cat="all">All</button>
+        <button class="filter-btn" data-cat="Health">🌿 Health</button>
+        <button class="filter-btn" data-cat="Learning">📚 Learning</button>
+        <button class="filter-btn" data-cat="Chores">🏠 Chores</button>
+        <button class="filter-btn" data-cat="Fitness">💪 Fitness</button>
+        <button class="filter-btn" data-cat="Creativity">🎨 Creativity</button>
+        <button class="filter-btn" data-cat="Social">💬 Social</button>
+        <button class="filter-btn" data-cat="Mindfulness">🧘 Mindfulness</button>
+        <button class="filter-btn" data-cat="Other">🌟 Other</button>
+      </div>
+
+      <!-- Task List -->
+      <div class="task-list" id="taskList">
+        <div class="empty-state">
+          <div class="empty-icon">🗺️</div>
+          <h3>Your adventure awaits!</h3>
+          <p>Create your first quest to start earning XP and coins.</p>
+          <button class="btn btn-primary" id="openAddTaskEmpty">+ Create First Quest</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ SHOP / REWARDS ═══════════════════ -->
+    <section class="tab-panel" id="tab-shop">
+      <div class="page-header">
+        <h1 class="page-title">Rewards Shop 🛍️</h1>
+        <div class="shop-header-right">
+          <div class="coin-balance-display">🪙 <span id="shopCoins">0</span> coins</div>
+          <button class="btn btn-primary" id="openAddReward">+ New Reward</button>
+        </div>
+      </div>
+
+      <div class="reward-list" id="rewardList">
+        <div class="empty-state">
+          <div class="empty-icon">🎁</div>
+          <h3>Build your reward shelf!</h3>
+          <p>Add things you love — candy, game time, a movie night — and redeem them with earned coins.</p>
+          <button class="btn btn-primary" id="openAddRewardEmpty">+ Add First Reward</button>
+        </div>
+      </div>
+
+      <!-- Redemption History -->
+      <div class="card redemption-history" id="redemptionHistoryCard" style="display:none">
+        <div class="card-header">
+          <h2 class="card-title">Redemption History</h2>
+        </div>
+        <div class="redemption-list" id="redemptionList"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ FOREST ═══════════════════ -->
+    <section class="tab-panel" id="tab-forest">
+      <div class="page-header">
+        <h1 class="page-title">My Forest 🌿</h1>
+        <p class="page-subtitle">Your forest grows with every productive day.</p>
+      </div>
+      <div class="forest-stats-row">
+        <div class="forest-stat">🌳 <span id="forestTrees">0</span> Trees</div>
+        <div class="forest-stat">🌸 <span id="forestFlowers">0</span> Flowers</div>
+        <div class="forest-stat">🦋 <span id="forestAnimals">0</span> Visitors</div>
+        <div class="forest-stat">📅 <span id="forestDays">0</span> Days Grown</div>
+      </div>
+      <div class="forest-scene" id="forestScene">
+        <div class="forest-sky" id="forestSky">
+          <div class="forest-sun" id="forestSun">☀️</div>
+          <div class="forest-clouds" id="forestClouds"></div>
+        </div>
+        <div class="forest-ground" id="forestGround"></div>
+        <div class="forest-elements" id="forestElements"></div>
+      </div>
+      <div class="forest-legend card">
+        <h3>Forest Milestones</h3>
+        <div class="legend-grid" id="forestLegend"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ ACHIEVEMENTS ═══════════════════ -->
+    <section class="tab-panel" id="tab-achievements">
+      <div class="page-header">
+        <h1 class="page-title">Badges & Achievements 🏅</h1>
+        <p class="page-subtitle">Track your milestones and unlock legendary status.</p>
+      </div>
+      <div class="achievements-progress card">
+        <span>Badges Earned: <strong id="badgesEarned">0</strong> / <strong id="badgesTotal">0</strong></span>
+        <div class="badges-progress-bar">
+          <div class="badges-progress-fill" id="badgesProgressFill"></div>
+        </div>
+      </div>
+      <div class="achievements-grid" id="achievementsGrid"></div>
+    </section>
+
+    <!-- ═══════════════════ TRENDS ═══════════════════ -->
+    <section class="tab-panel" id="tab-trends">
+      <div class="page-header">
+        <h1 class="page-title">Trends & Progress 📊</h1>
+      </div>
+
+      <div class="trends-time-filter">
+        <button class="filter-btn active" data-range="7">7 Days</button>
+        <button class="filter-btn" data-range="30">30 Days</button>
+        <button class="filter-btn" data-range="90">90 Days</button>
+      </div>
+
+      <div class="charts-grid">
+        <div class="card chart-card">
+          <h3 class="chart-title">XP Earned</h3>
+          <canvas id="xpChart"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3 class="chart-title">Tasks Completed</h3>
+          <canvas id="tasksChart"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3 class="chart-title">Category Breakdown</h3>
+          <canvas id="categoryChart"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3 class="chart-title">Streak History</h3>
+          <canvas id="streakChart"></canvas>
+        </div>
+      </div>
+
+      <div class="trends-summary card">
+        <h3>All-Time Summary</h3>
+        <div class="summary-stats">
+          <div class="summary-stat">
+            <div class="summary-icon">✅</div>
+            <div class="summary-val" id="summaryTotal">0</div>
+            <div class="summary-label">Total Tasks</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-icon">✨</div>
+            <div class="summary-val" id="summaryXP">0</div>
+            <div class="summary-label">Total XP</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-icon">🔥</div>
+            <div class="summary-val" id="summaryStreak">0</div>
+            <div class="summary-label">Best Streak</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-icon">🎁</div>
+            <div class="summary-val" id="summaryRedeemed">0</div>
+            <div class="summary-label">Rewards Redeemed</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ════════════════════════════════════
+       MODALS
+  ════════════════════════════════════ -->
+
+  <!-- Add / Edit Task Modal -->
+  <div class="modal-overlay" id="taskModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="taskModalTitle">New Quest</h2>
+        <button class="modal-close" id="closeTaskModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Quest Name</label>
+        <input class="form-input" id="taskName" type="text" placeholder="e.g. Drink 8 glasses of water" maxlength="80" />
+
+        <label class="form-label">Category</label>
+        <select class="form-input" id="taskCategory">
+          <option value="Health">🌿 Health</option>
+          <option value="Learning">📚 Learning</option>
+          <option value="Chores">🏠 Chores</option>
+          <option value="Fitness">💪 Fitness</option>
+          <option value="Creativity">🎨 Creativity</option>
+          <option value="Social">💬 Social</option>
+          <option value="Mindfulness">🧘 Mindfulness</option>
+          <option value="Other">🌟 Other</option>
+        </select>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">XP Reward</label>
+            <input class="form-input" id="taskXP" type="number" min="1" max="500" value="10" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Coin Reward</label>
+            <input class="form-input" id="taskCoins" type="number" min="1" max="200" value="5" />
+          </div>
+        </div>
+
+        <label class="form-label">Repeats</label>
+        <select class="form-input" id="taskRepeat">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="once">One-time</option>
+        </select>
+
+        <label class="form-label">Notes (optional)</label>
+        <textarea class="form-input" id="taskNotes" rows="2" placeholder="Any extra details..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="deleteTaskBtn" style="display:none;color:var(--danger)">🗑 Delete</button>
+        <div class="modal-footer-right">
+          <button class="btn btn-ghost" id="cancelTaskModal">Cancel</button>
+          <button class="btn btn-primary" id="saveTask">Save Quest</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit Reward Modal -->
+  <div class="modal-overlay" id="rewardModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="rewardModalTitle">New Reward</h2>
+        <button class="modal-close" id="closeRewardModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Reward Name</label>
+        <input class="form-input" id="rewardName" type="text" placeholder="e.g. Movie Night 🎬" maxlength="60" />
+
+        <label class="form-label">Description (optional)</label>
+        <input class="form-input" id="rewardDesc" type="text" placeholder="e.g. Pick any movie on Netflix" maxlength="100" />
+
+        <label class="form-label">Emoji Icon</label>
+        <input class="form-input" id="rewardIcon" type="text" placeholder="🎁" maxlength="4" />
+
+        <label class="form-label">Coin Cost</label>
+        <input class="form-input" id="rewardCost" type="number" min="1" max="9999" value="50" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="deleteRewardBtn" style="display:none;color:var(--danger)">🗑 Delete</button>
+        <div class="modal-footer-right">
+          <button class="btn btn-ghost" id="cancelRewardModal">Cancel</button>
+          <button class="btn btn-primary" id="saveReward">Save Reward</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Redeem Modal -->
+  <div class="modal-overlay" id="redeemModal">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2>Redeem Reward</h2>
+        <button class="modal-close" id="closeRedeemModal">✕</button>
+      </div>
+      <div class="modal-body" style="text-align:center">
+        <div class="redeem-icon" id="redeemIcon">🎁</div>
+        <h3 id="redeemName"></h3>
+        <p>This costs <strong id="redeemCost"></strong> coins.</p>
+        <p id="redeemBalance"></p>
+      </div>
+      <div class="modal-footer" style="justify-content:center">
+        <button class="btn btn-ghost" id="cancelRedeem">Cancel</button>
+        <button class="btn btn-accent" id="confirmRedeem">Redeem! 🎉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Settings ⚙️</h2>
+        <button class="modal-close" id="closeSettings">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Your Name</label>
+        <input class="form-input" id="settingsName" type="text" placeholder="Adventurer" maxlength="30" />
+        <label class="form-label">Avatar</label>
+        <div class="avatar-picker" id="avatarPicker">
+          <button class="avatar-opt" data-av="🧝">🧝</button>
+          <button class="avatar-opt" data-av="🧙">🧙</button>
+          <button class="avatar-opt" data-av="🦸">🦸</button>
+          <button class="avatar-opt" data-av="🧚">🧚</button>
+          <button class="avatar-opt" data-av="🌸">🌸</button>
+          <button class="avatar-opt" data-av="🌻">🌻</button>
+          <button class="avatar-opt" data-av="🦊">🦊</button>
+          <button class="avatar-opt" data-av="🐉">🐉</button>
+          <button class="avatar-opt" data-av="🌙">🌙</button>
+          <button class="avatar-opt" data-av="⭐">⭐</button>
+        </div>
+        <div class="settings-danger-zone">
+          <h4>Data</h4>
+          <div class="danger-btns">
+            <button class="btn btn-ghost" id="exportDataBtn">📥 Export Data</button>
+            <button class="btn btn-ghost" id="importDataBtn">📤 Import Data</button>
+            <input type="file" id="importFileInput" accept=".json" style="display:none" />
+            <button class="btn btn-ghost" style="color:var(--danger)" id="resetDataBtn">🗑 Reset All Data</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer modal-footer-right">
+        <button class="btn btn-primary" id="saveSettings">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast / Achievement Pop-up -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Achievement Unlock Fanfare -->
+  <div class="achievement-fanfare" id="achievementFanfare" style="display:none">
+    <div class="fanfare-inner">
+      <div class="fanfare-icon" id="fanfareIcon">🏅</div>
+      <div class="fanfare-title">Badge Unlocked!</div>
+      <div class="fanfare-name" id="fanfareName"></div>
+    </div>
+  </div>
+
+  <!-- Level Up Fanfare -->
+  <div class="levelup-fanfare" id="levelupFanfare" style="display:none">
+    <div class="fanfare-inner">
+      <div class="fanfare-icon">⭐</div>
+      <div class="fanfare-title">Level Up!</div>
+      <div class="fanfare-name" id="levelupName"></div>
+    </div>
+  </div>
+
+  
+  
+  
+  
+  <script>
+// ════════════════════════════════════════════════════
+//  Forest Quest — data.js
+//  All LocalStorage read/write, state management
+// ════════════════════════════════════════════════════
+
+const FQ = (() => {
+
+  // ── STORAGE KEY ──
+  const KEY = 'forestQuestData_v2';
+
+  // ── DEFAULT STATE ──
+  function defaultState() {
+    return {
+      profile: {
+        name: 'Adventurer',
+        avatar: '🧝',
+        createdAt: today()
+      },
+      stats: {
+        xp: 0,
+        totalXP: 0,
+        coins: 0,
+        totalCoins: 0,
+        level: 1,
+        streak: 0,
+        bestStreak: 0,
+        lastActiveDate: null,
+        totalTasksCompleted: 0,
+        totalRewardsRedeemed: 0
+      },
+      tasks: [],
+      rewards: [],
+      completionLog: {},   // { 'YYYY-MM-DD': [taskId, ...] }
+      xpLog: {},           // { 'YYYY-MM-DD': xpAmount }
+      redeemLog: [],       // [{rewardId, name, cost, icon, date}]
+      achievements: {},    // { achievementId: { unlockedAt } }
+      forestProgress: {
+        productiveDays: 0,
+        lastGrowthDate: null
+      }
+    };
+  }
+
+  // ── STATE ──
+  let state = null;
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        // Merge defaults for any missing keys
+        state = deepMerge(defaultState(), parsed);
+      } else {
+        state = defaultState();
+        seedDefaults();
+      }
+    } catch (e) {
+      console.warn('FQ: failed to parse saved data, using defaults.', e);
+      state = defaultState();
+      seedDefaults();
+    }
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+    } catch (e) {
+      console.error('FQ: failed to save data.', e);
+    }
+  }
+
+  function deepMerge(base, override) {
+    const result = { ...base };
+    for (const k in override) {
+      if (override[k] && typeof override[k] === 'object' && !Array.isArray(override[k])) {
+        result[k] = deepMerge(base[k] || {}, override[k]);
+      } else {
+        result[k] = override[k];
+      }
+    }
+    return result;
+  }
+
+  function seedDefaults() {
+    // Seed some example tasks
+    state.tasks = [
+      { id: uid(), name: 'Drink 8 glasses of water', category: 'Health', xp: 15, coins: 8, repeat: 'daily', notes: '', createdAt: today() },
+      { id: uid(), name: 'Read for 20 minutes', category: 'Learning', xp: 20, coins: 10, repeat: 'daily', notes: '', createdAt: today() },
+      { id: uid(), name: 'Take a 15-min walk', category: 'Fitness', xp: 25, coins: 12, repeat: 'daily', notes: '', createdAt: today() },
+      { id: uid(), name: 'Tidy up bedroom', category: 'Chores', xp: 20, coins: 10, repeat: 'daily', notes: '', createdAt: today() }
+    ];
+    // Seed some example rewards
+    state.rewards = [
+      { id: uid(), name: 'Sweet Treat 🍬', desc: 'One piece of candy or chocolate', icon: '🍬', cost: 30, createdAt: today() },
+      { id: uid(), name: 'Gaming Session 🎮', desc: '30 minutes of video games', icon: '🎮', cost: 80, createdAt: today() },
+      { id: uid(), name: 'Movie Night 🎬', desc: 'Pick any movie!', icon: '🎬', cost: 150, createdAt: today() },
+      { id: uid(), name: 'Extra Reading Time 📚', desc: '1 hour guilt-free reading', icon: '📚', cost: 60, createdAt: today() }
+    ];
+    save();
+  }
+
+  // ── HELPERS ──
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function today() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  }
+
+  // ── LEVEL MATH ──
+  // XP needed to reach level N: 100 * N * (N+1) / 2 cumulative
+  function xpForLevel(level) {
+    return 100 * level;  // XP to go from level-1 to level
+  }
+
+  function totalXpForLevel(level) {
+    // Total XP needed to reach this level from 0
+    return level <= 1 ? 0 : (level - 1) * level * 50;
+  }
+
+  function computeLevel(totalXP) {
+    let level = 1;
+    while (totalXP >= totalXpForLevel(level + 1)) {
+      level++;
+      if (level > 999) break;
+    }
+    return level;
+  }
+
+  function xpIntoCurrentLevel(totalXP) {
+    const level = computeLevel(totalXP);
+    return totalXP - totalXpForLevel(level);
+  }
+
+  function xpNeededForNextLevel(totalXP) {
+    const level = computeLevel(totalXP);
+    return totalXpForLevel(level + 1) - totalXpForLevel(level);
+  }
+
+  // ── STREAK UPDATE ──
+  function updateStreak() {
+    const t = today();
+    const last = state.stats.lastActiveDate;
+    if (last === t) return; // already counted today
+
+    const yesterday = dateOffset(-1);
+    if (last === yesterday) {
+      state.stats.streak++;
+    } else if (last !== t) {
+      // Not yesterday → reset if last was more than 1 day ago
+      if (last && last < yesterday) {
+        state.stats.streak = 1;
+      } else if (!last) {
+        state.stats.streak = 1;
+      }
+    }
+    state.stats.lastActiveDate = t;
+    if (state.stats.streak > state.stats.bestStreak) {
+      state.stats.bestStreak = state.stats.streak;
+    }
+  }
+
+  function dateOffset(days) {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
+  }
+
+  // ── TASK COMPLETION ──
+  function isTaskDoneToday(taskId) {
+    const log = state.completionLog[today()] || [];
+    return log.includes(taskId);
+  }
+
+  function completeTask(taskId) {
+    const task = state.tasks.find(t => t.id === taskId);
+    if (!task) return null;
+    if (isTaskDoneToday(taskId)) return null; // already done
+
+    const t = today();
+    if (!state.completionLog[t]) state.completionLog[t] = [];
+    state.completionLog[t].push(taskId);
+
+    // Award XP & coins
+    state.stats.xp += task.xp;
+    state.stats.totalXP += task.xp;
+    state.stats.coins += task.coins;
+    state.stats.totalCoins += task.coins;
+    state.stats.totalTasksCompleted++;
+
+    // Update XP log
+    state.xpLog[t] = (state.xpLog[t] || 0) + task.xp;
+
+    // Update streak
+    updateStreak();
+
+    // Recalculate level
+    const newLevel = computeLevel(state.stats.totalXP);
+    const oldLevel = state.stats.level;
+    state.stats.level = newLevel;
+
+    // Forest growth
+    updateForestGrowth();
+
+    save();
+    return { task, levelUp: newLevel > oldLevel, newLevel, oldLevel };
+  }
+
+  function uncompleteTask(taskId) {
+    const task = state.tasks.find(t => t.id === taskId);
+    if (!task) return null;
+    const t = today();
+    const log = state.completionLog[t] || [];
+    const idx = log.indexOf(taskId);
+    if (idx === -1) return null;
+
+    state.completionLog[t].splice(idx, 1);
+    state.stats.xp = Math.max(0, state.stats.xp - task.xp);
+    state.stats.totalXP = Math.max(0, state.stats.totalXP - task.xp);
+    state.stats.coins = Math.max(0, state.stats.coins - task.coins);
+    state.stats.totalCoins = Math.max(0, state.stats.totalCoins - task.coins);
+    state.stats.totalTasksCompleted = Math.max(0, state.stats.totalTasksCompleted - 1);
+    state.xpLog[t] = Math.max(0, (state.xpLog[t] || 0) - task.xp);
+    state.stats.level = computeLevel(state.stats.totalXP);
+    save();
+    return task;
+  }
+
+  // ── FOREST GROWTH ──
+  function updateForestGrowth() {
+    const t = today();
+    if (state.forestProgress.lastGrowthDate === t) return;
+    const log = state.completionLog[t] || [];
+    if (log.length > 0) {
+      state.forestProgress.productiveDays++;
+      state.forestProgress.lastGrowthDate = t;
+    }
+  }
+
+  // ── TASKS CRUD ──
+  function addTask(data) {
+    const task = {
+      id: uid(),
+      name: data.name.trim(),
+      category: data.category || 'Other',
+      xp: Math.max(1, parseInt(data.xp) || 10),
+      coins: Math.max(1, parseInt(data.coins) || 5),
+      repeat: data.repeat || 'daily',
+      notes: data.notes || '',
+      createdAt: today()
+    };
+    state.tasks.push(task);
+    save();
+    return task;
+  }
+
+  function updateTask(id, data) {
+    const idx = state.tasks.findIndex(t => t.id === id);
+    if (idx === -1) return null;
+    state.tasks[idx] = { ...state.tasks[idx], ...data, id };
+    save();
+    return state.tasks[idx];
+  }
+
+  function deleteTask(id) {
+    state.tasks = state.tasks.filter(t => t.id !== id);
+    save();
+  }
+
+  // ── REWARDS CRUD ──
+  function addReward(data) {
+    const reward = {
+      id: uid(),
+      name: data.name.trim(),
+      desc: data.desc || '',
+      icon: data.icon || '🎁',
+      cost: Math.max(1, parseInt(data.cost) || 50),
+      createdAt: today()
+    };
+    state.rewards.push(reward);
+    save();
+    return reward;
+  }
+
+  function updateReward(id, data) {
+    const idx = state.rewards.findIndex(r => r.id === id);
+    if (idx === -1) return null;
+    state.rewards[idx] = { ...state.rewards[idx], ...data, id };
+    save();
+    return state.rewards[idx];
+  }
+
+  function deleteReward(id) {
+    state.rewards = state.rewards.filter(r => r.id !== id);
+    save();
+  }
+
+  function redeemReward(id) {
+    const reward = state.rewards.find(r => r.id === id);
+    if (!reward) return { ok: false, reason: 'Reward not found' };
+    if (state.stats.coins < reward.cost) return { ok: false, reason: 'Not enough coins' };
+    state.stats.coins -= reward.cost;
+    state.stats.totalRewardsRedeemed++;
+    state.redeemLog.push({ rewardId: id, name: reward.name, icon: reward.icon, cost: reward.cost, date: today() });
+    save();
+    return { ok: true, reward };
+  }
+
+  // ── ACHIEVEMENTS ──
+  function unlockAchievement(id) {
+    if (state.achievements[id]) return false;
+    state.achievements[id] = { unlockedAt: today() };
+    save();
+    return true;
+  }
+
+  // ── GETTERS ──
+  function getCompletedToday() {
+    const log = state.completionLog[today()] || [];
+    return log.map(id => state.tasks.find(t => t.id === id)).filter(Boolean);
+  }
+
+  function getStreakCalendar(days = 28) {
+    const result = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = dateOffset(-i);
+      const log = state.completionLog[d] || [];
+      result.push({ date: d, count: log.length, active: log.length > 0 });
+    }
+    return result;
+  }
+
+  function getDailyXP(days = 30) {
+    const result = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = dateOffset(-i);
+      result.push({ date: d, xp: state.xpLog[d] || 0 });
+    }
+    return result;
+  }
+
+  function getDailyTaskCount(days = 30) {
+    const result = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = dateOffset(-i);
+      result.push({ date: d, count: (state.completionLog[d] || []).length });
+    }
+    return result;
+  }
+
+  function getCategoryBreakdown() {
+    const breakdown = {};
+    for (const [date, ids] of Object.entries(state.completionLog)) {
+      for (const id of ids) {
+        const task = state.tasks.find(t => t.id === id);
+        if (task) {
+          breakdown[task.category] = (breakdown[task.category] || 0) + 1;
+        }
+      }
+    }
+    return breakdown;
+  }
+
+  function getStreakHistory(days = 30) {
+    const result = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = dateOffset(-i);
+      result.push({ date: d, active: (state.completionLog[d] || []).length > 0 ? 1 : 0 });
+    }
+    return result;
+  }
+
+  function exportData() {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `forest-quest-backup-${today()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importData(json) {
+    const parsed = JSON.parse(json);
+    state = deepMerge(defaultState(), parsed);
+    save();
+  }
+
+  function resetData() {
+    state = defaultState();
+    seedDefaults();
+    save();
+  }
+
+  // ── XP Progress Helpers ──
+  function getLevelProgress() {
+    const totalXP = state.stats.totalXP;
+    const level = state.stats.level;
+    const xpIn = xpIntoCurrentLevel(totalXP);
+    const xpNeeded = xpNeededForNextLevel(totalXP);
+    const pct = Math.min(100, (xpIn / xpNeeded) * 100);
+    return { level, xpIn, xpNeeded, pct, totalXP };
+  }
+
+  // Initialize
+  load();
+
+  return {
+    get state() { return state; },
+    save,
+    today,
+    formatDate,
+    dateOffset,
+    uid,
+    getLevelProgress,
+    computeLevel,
+    xpForLevel,
+    isTaskDoneToday,
+    completeTask,
+    uncompleteTask,
+    getCompletedToday,
+    getStreakCalendar,
+    getDailyXP,
+    getDailyTaskCount,
+    getCategoryBreakdown,
+    getStreakHistory,
+    addTask,
+    updateTask,
+    deleteTask,
+    addReward,
+    updateReward,
+    deleteReward,
+    redeemReward,
+    unlockAchievement,
+    updateForestGrowth,
+    exportData,
+    importData,
+    resetData
+  };
+})();
+
+</script>
+<script>
+// ════════════════════════════════════════════════════
+//  Forest Quest — forest.js
+//  Forest of Progress: grows elements based on productive days
+// ════════════════════════════════════════════════════
+
+const ForestModule = (() => {
+
+  const MILESTONES = [
+    // { days, emoji, label, layer, type }
+    { days: 1,   emoji: '🌱', label: 'First Sprout',     layer: 'ground', type: 'plant',  size: 1.5 },
+    { days: 2,   emoji: '🌸', label: 'Cherry Blossom',   layer: 'mid',    type: 'flower', size: 2.0 },
+    { days: 3,   emoji: '🌿', label: 'Lush Ferns',       layer: 'ground', type: 'plant',  size: 1.8 },
+    { days: 5,   emoji: '🌳', label: 'Oak Tree',         layer: 'back',   type: 'tree',   size: 3.5 },
+    { days: 7,   emoji: '🦋', label: 'Butterfly',        layer: 'mid',    type: 'animal', size: 1.8, animated: true },
+    { days: 10,  emoji: '🍄', label: 'Magic Mushrooms',  layer: 'ground', type: 'plant',  size: 1.6 },
+    { days: 14,  emoji: '🌲', label: 'Pine Tree',        layer: 'back',   type: 'tree',   size: 3.8 },
+    { days: 20,  emoji: '🦊', label: 'Forest Fox',       layer: 'ground', type: 'animal', size: 2.0, animated: true },
+    { days: 21,  emoji: '🌷', label: 'Tulip Garden',     layer: 'ground', type: 'flower', size: 1.8 },
+    { days: 25,  emoji: '🐦', label: 'Songbird',         layer: 'mid',    type: 'animal', size: 1.6, animated: true },
+    { days: 30,  emoji: '🌺', label: 'Hibiscus',         layer: 'mid',    type: 'flower', size: 2.2 },
+    { days: 35,  emoji: '🦌', label: 'Deer Visitor',     layer: 'ground', type: 'animal', size: 2.4, animated: true },
+    { days: 40,  emoji: '🍀', label: 'Lucky Clover',     layer: 'ground', type: 'plant',  size: 1.4 },
+    { days: 45,  emoji: '🌴', label: 'Tropical Tree',    layer: 'back',   type: 'tree',   size: 3.2 },
+    { days: 50,  emoji: '🐿️', label: 'Squirrel',        layer: 'mid',    type: 'animal', size: 1.8, animated: true },
+    { days: 60,  emoji: '✨', label: 'Fairy Lights',     layer: 'mid',    type: 'magic',  size: 1.6, animated: true },
+    { days: 70,  emoji: '🌙', label: 'Moon Spirit',      layer: 'sky',    type: 'magic',  size: 2.2, animated: true },
+    { days: 80,  emoji: '🦉', label: 'Wise Owl',         layer: 'mid',    type: 'animal', size: 2.0, animated: true },
+    { days: 90,  emoji: '🌈', label: 'Rainbow',          layer: 'sky',    type: 'magic',  size: 3.0, animated: true },
+    { days: 100, emoji: '🐉', label: 'Forest Dragon',    layer: 'sky',    type: 'animal', size: 3.5, animated: true },
+    { days: 120, emoji: '⭐', label: 'Star Cluster',     layer: 'sky',    type: 'magic',  size: 2.0, animated: true },
+    { days: 150, emoji: '🏰', label: 'Forest Castle',    layer: 'back',   type: 'magic',  size: 4.0 },
+    { days: 200, emoji: '🌟', label: 'Eternal Star',     layer: 'sky',    type: 'magic',  size: 2.5, animated: true },
+    { days: 365, emoji: '🌍', label: 'World Tree',       layer: 'back',   type: 'tree',   size: 5.0 }
+  ];
+
+  let cloudInterval = null;
+  let animInterval = null;
+
+  function getUnlockedMilestones(productiveDays) {
+    return MILESTONES.filter(m => productiveDays >= m.days);
+  }
+
+  function render() {
+    const container = document.getElementById('forestElements');
+    const scene = document.getElementById('forestScene');
+    if (!container || !scene) return;
+
+    const days = FQ.state.forestProgress.productiveDays;
+    const unlocked = getUnlockedMilestones(days);
+
+    // Clear
+    container.innerHTML = '';
+
+    if (days === 0) {
+      // Show lonely empty forest hint
+      container.innerHTML = `<div style="position:absolute;bottom:20%;left:50%;transform:translateX(-50%);text-align:center;color:rgba(255,255,255,.7);font-size:.9rem;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.3)">Complete quests to grow your forest! 🌱</div>`;
+      return;
+    }
+
+    // Place elements with pseudo-random but deterministic positions
+    unlocked.forEach((milestone, i) => {
+      const el = document.createElement('span');
+      el.classList.add('forest-element');
+      el.textContent = milestone.emoji;
+
+      // Deterministic position based on index
+      const seed = i * 137.508; // golden angle
+      const left = 5 + ((seed * 13.7) % 85); // 5% to 90%
+      let bottom;
+      switch (milestone.layer) {
+        case 'sky':    bottom = 65 + ((seed * 7.3) % 20); break;
+        case 'back':   bottom = 42 + ((seed * 9.1) % 18); break;
+        case 'mid':    bottom = 30 + ((seed * 11.3) % 18); break;
+        default:       bottom = 18 + ((seed * 5.7) % 16); break;
+      }
+
+      el.style.cssText = `
+        left: ${left}%;
+        bottom: ${bottom}%;
+        font-size: ${milestone.size}rem;
+        animation-delay: ${(i * 0.15) % 3}s;
+        animation-duration: ${2.5 + (i * 0.4) % 2}s;
+        z-index: ${milestone.layer === 'back' ? 1 : milestone.layer === 'mid' ? 2 : milestone.layer === 'sky' ? 0 : 3};
+        filter: drop-shadow(0 4px 10px rgba(0,0,0,.15));
+      `;
+
+      // Extra animations for special elements
+      if (milestone.animated) {
+        el.style.animationName = getAnimationForType(milestone.type, i);
+      }
+
+      container.appendChild(el);
+    });
+
+    // Render clouds (always present, more with more days)
+    renderClouds(days);
+  }
+
+  function getAnimationForType(type, i) {
+    const anims = {
+      animal: i % 2 === 0 ? 'animalBounce' : 'elementSway',
+      magic: 'magicFloat',
+      flower: 'elementSway',
+      tree: 'elementSway'
+    };
+    return anims[type] || 'elementSway';
+  }
+
+  function renderClouds(days) {
+    const cloudsEl = document.getElementById('forestClouds');
+    if (!cloudsEl) return;
+    cloudsEl.innerHTML = '';
+
+    const cloudCount = Math.min(6, 1 + Math.floor(days / 5));
+    const cloudEmojis = ['☁️', '⛅', '🌤️', '☁️', '☁️'];
+    for (let i = 0; i < cloudCount; i++) {
+      const c = document.createElement('span');
+      c.className = 'forest-cloud';
+      c.textContent = cloudEmojis[i % cloudEmojis.length];
+      const top = 5 + (i * 11) % 35;
+      const speed = 25 + (i * 7) % 30;
+      const delay = -(i * speed / cloudCount);
+      c.style.cssText = `
+        top: ${top}%;
+        font-size: ${1.5 + (i * 0.2) % 0.8}rem;
+        left: -5%;
+        animation-duration: ${speed}s;
+        animation-delay: ${delay}s;
+      `;
+      cloudsEl.appendChild(c);
+    }
+  }
+
+  function renderLegend() {
+    const container = document.getElementById('forestLegend');
+    if (!container) return;
+    const days = FQ.state.forestProgress.productiveDays;
+    container.innerHTML = '';
+
+    MILESTONES.forEach(m => {
+      const unlocked = days >= m.days;
+      const item = document.createElement('div');
+      item.className = 'legend-item ' + (unlocked ? 'unlocked' : 'locked');
+      item.innerHTML = `
+        <span class="legend-icon">${m.emoji}</span>
+        <div>
+          <div class="legend-label">${m.label}</div>
+          <div class="legend-req">${unlocked ? '✅ Unlocked' : `${m.days} productive days`}</div>
+        </div>
+      `;
+      container.appendChild(item);
+    });
+  }
+
+  function renderStats() {
+    const days = FQ.state.forestProgress.productiveDays;
+    const unlocked = getUnlockedMilestones(days);
+    const trees = unlocked.filter(m => m.type === 'tree').length;
+    const flowers = unlocked.filter(m => m.type === 'flower').length;
+    const animals = unlocked.filter(m => m.type === 'animal').length;
+
+    const el = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+    el('forestTrees', trees);
+    el('forestFlowers', flowers);
+    el('forestAnimals', animals);
+    el('forestDays', days);
+  }
+
+  function injectKeyframes() {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes animalBounce {
+        0%,100%{transform:translateY(0) rotate(-1deg)}
+        30%{transform:translateY(-8px) rotate(1deg)}
+        60%{transform:translateY(-3px) rotate(-1deg)}
+      }
+      @keyframes magicFloat {
+        0%,100%{transform:translateY(0) scale(1)}
+        50%{transform:translateY(-12px) scale(1.08)}
+      }
+      @keyframes cloudDrift {
+        0%{transform:translateX(0)}
+        100%{transform:translateX(calc(100vw + 10%))}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function init() {
+    injectKeyframes();
+    render();
+    renderLegend();
+    renderStats();
+  }
+
+  function refresh() {
+    render();
+    renderLegend();
+    renderStats();
+  }
+
+  return { init, refresh, MILESTONES, getUnlockedMilestones };
+})();
+
+</script>
+<script>
+// ════════════════════════════════════════════════════
+//  Forest Quest — achievements.js
+//  Badge definitions and unlock checking
+// ════════════════════════════════════════════════════
+
+const AchievementsModule = (() => {
+
+  const BADGES = [
+    // ── FIRST STEPS ──
+    {
+      id: 'first_task',
+      icon: '🌱',
+      name: 'First Steps',
+      desc: 'Complete your very first quest',
+      check: (s) => s.totalTasksCompleted >= 1
+    },
+    {
+      id: 'five_tasks',
+      icon: '🌿',
+      name: 'Getting Going',
+      desc: 'Complete 5 quests in total',
+      check: (s) => s.totalTasksCompleted >= 5
+    },
+    {
+      id: 'ten_tasks',
+      icon: '✨',
+      name: 'Quest Seeker',
+      desc: 'Complete 10 quests in total',
+      check: (s) => s.totalTasksCompleted >= 10
+    },
+    {
+      id: 'fifty_tasks',
+      icon: '⚡',
+      name: 'Quest Champion',
+      desc: 'Complete 50 quests in total',
+      check: (s) => s.totalTasksCompleted >= 50
+    },
+    {
+      id: 'hundred_tasks',
+      icon: '🏆',
+      name: 'Legend of the Realm',
+      desc: 'Complete 100 quests in total',
+      check: (s) => s.totalTasksCompleted >= 100
+    },
+    {
+      id: 'fivehundred_tasks',
+      icon: '👑',
+      name: 'Eternal Champion',
+      desc: 'Complete 500 quests in total',
+      check: (s) => s.totalTasksCompleted >= 500
+    },
+
+    // ── STREAKS ──
+    {
+      id: 'streak_3',
+      icon: '🔥',
+      name: 'Kindling',
+      desc: 'Maintain a 3-day streak',
+      check: (s) => s.bestStreak >= 3
+    },
+    {
+      id: 'streak_7',
+      icon: '🌟',
+      name: 'Week Warrior',
+      desc: 'Maintain a 7-day streak',
+      check: (s) => s.bestStreak >= 7
+    },
+    {
+      id: 'streak_14',
+      icon: '💪',
+      name: 'Fortnight Fire',
+      desc: 'Maintain a 14-day streak',
+      check: (s) => s.bestStreak >= 14
+    },
+    {
+      id: 'streak_30',
+      icon: '🌙',
+      name: 'Moon Cycle Master',
+      desc: 'Maintain a 30-day streak',
+      check: (s) => s.bestStreak >= 30
+    },
+    {
+      id: 'streak_100',
+      icon: '☀️',
+      name: 'Centurion',
+      desc: 'Maintain a 100-day streak',
+      check: (s) => s.bestStreak >= 100
+    },
+
+    // ── LEVELS ──
+    {
+      id: 'level_5',
+      icon: '⭐',
+      name: 'Rising Star',
+      desc: 'Reach Level 5',
+      check: (s) => s.level >= 5
+    },
+    {
+      id: 'level_10',
+      icon: '🌠',
+      name: 'Star Explorer',
+      desc: 'Reach Level 10',
+      check: (s) => s.level >= 10
+    },
+    {
+      id: 'level_20',
+      icon: '🌙',
+      name: 'Moonlit Adventurer',
+      desc: 'Reach Level 20',
+      check: (s) => s.level >= 20
+    },
+    {
+      id: 'level_50',
+      icon: '🌌',
+      name: 'Cosmic Wanderer',
+      desc: 'Reach Level 50',
+      check: (s) => s.level >= 50
+    },
+
+    // ── COINS & REWARDS ──
+    {
+      id: 'first_redeem',
+      icon: '🎁',
+      name: 'Treat Yourself',
+      desc: 'Redeem your first reward',
+      check: (s) => s.totalRewardsRedeemed >= 1
+    },
+    {
+      id: 'five_redeems',
+      icon: '🛍️',
+      name: 'Reward Hunter',
+      desc: 'Redeem 5 rewards',
+      check: (s) => s.totalRewardsRedeemed >= 5
+    },
+    {
+      id: 'coins_100',
+      icon: '🪙',
+      name: 'Coin Collector',
+      desc: 'Earn 100 coins in total',
+      check: (s) => s.totalCoins >= 100
+    },
+    {
+      id: 'coins_500',
+      icon: '💰',
+      name: 'Treasure Hunter',
+      desc: 'Earn 500 coins in total',
+      check: (s) => s.totalCoins >= 500
+    },
+    {
+      id: 'coins_1000',
+      icon: '🏦',
+      name: 'Golden Vault',
+      desc: 'Earn 1,000 coins in total',
+      check: (s) => s.totalCoins >= 1000
+    },
+
+    // ── XP ──
+    {
+      id: 'xp_500',
+      icon: '💫',
+      name: 'XP Sprout',
+      desc: 'Earn 500 total XP',
+      check: (s) => s.totalXP >= 500
+    },
+    {
+      id: 'xp_1000',
+      icon: '🌟',
+      name: 'XP Bloomer',
+      desc: 'Earn 1,000 total XP',
+      check: (s) => s.totalXP >= 1000
+    },
+    {
+      id: 'xp_5000',
+      icon: '✨',
+      name: 'XP Radiant',
+      desc: 'Earn 5,000 total XP',
+      check: (s) => s.totalXP >= 5000
+    },
+    {
+      id: 'xp_10000',
+      icon: '🌌',
+      name: 'XP Legend',
+      desc: 'Earn 10,000 total XP',
+      check: (s) => s.totalXP >= 10000
+    },
+
+    // ── FOREST ──
+    {
+      id: 'forest_first',
+      icon: '🌳',
+      name: 'Planting Roots',
+      desc: 'Grow your first forest element',
+      check: (s, fp) => fp.productiveDays >= 1
+    },
+    {
+      id: 'forest_week',
+      icon: '🌲',
+      name: 'Forest Tender',
+      desc: 'Grow your forest for 7 days',
+      check: (s, fp) => fp.productiveDays >= 7
+    },
+    {
+      id: 'forest_month',
+      icon: '🌴',
+      name: 'Ancient Grove',
+      desc: 'Grow your forest for 30 days',
+      check: (s, fp) => fp.productiveDays >= 30
+    },
+    {
+      id: 'forest_century',
+      icon: '🌍',
+      name: 'World Forest',
+      desc: 'Grow your forest for 100 days',
+      check: (s, fp) => fp.productiveDays >= 100
+    }
+  ];
+
+  // Check all achievements and unlock newly met ones
+  function checkAll() {
+    const s = FQ.state.stats;
+    const fp = FQ.state.forestProgress;
+    const newlyUnlocked = [];
+
+    for (const badge of BADGES) {
+      if (!FQ.state.achievements[badge.id]) {
+        if (badge.check(s, fp)) {
+          FQ.unlockAchievement(badge.id);
+          newlyUnlocked.push(badge);
+        }
+      }
+    }
+    return newlyUnlocked;
+  }
+
+  function getAll() {
+    return BADGES.map(b => ({
+      ...b,
+      unlocked: !!FQ.state.achievements[b.id],
+      unlockedAt: FQ.state.achievements[b.id]?.unlockedAt || null
+    }));
+  }
+
+  function getUnlocked() {
+    return getAll().filter(b => b.unlocked);
+  }
+
+  function render() {
+    const container = document.getElementById('achievementsGrid');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const all = getAll();
+    all.forEach(badge => {
+      const card = document.createElement('div');
+      card.className = 'achievement-card ' + (badge.unlocked ? 'unlocked' : 'locked');
+      card.innerHTML = `
+        <div class="achievement-badge-icon">${badge.icon}</div>
+        <div class="achievement-name">${badge.name}</div>
+        <div class="achievement-desc">${badge.desc}</div>
+        ${badge.unlocked ? `<div class="achievement-date">✅ ${FQ.formatDate(badge.unlockedAt)}</div>` : '<div class="achievement-desc" style="color:var(--text-light);font-style:italic">Locked</div>'}
+      `;
+      container.appendChild(card);
+    });
+
+    // Progress bar
+    const earned = all.filter(b => b.unlocked).length;
+    const total = all.length;
+    const fill = document.getElementById('badgesProgressFill');
+    const earnedEl = document.getElementById('badgesEarned');
+    const totalEl = document.getElementById('badgesTotal');
+    if (fill) fill.style.width = total ? (earned / total * 100) + '%' : '0%';
+    if (earnedEl) earnedEl.textContent = earned;
+    if (totalEl) totalEl.textContent = total;
+  }
+
+  function renderRecentBadges() {
+    const container = document.getElementById('recentBadges');
+    if (!container) return;
+    const unlocked = getUnlocked().slice(-5).reverse();
+    if (!unlocked.length) {
+      container.innerHTML = '<div class="empty-state small"><p>Complete quests to earn your first badge! 🏅</p></div>';
+      return;
+    }
+    container.innerHTML = '';
+    unlocked.forEach(b => {
+      const chip = document.createElement('div');
+      chip.className = 'badge-chip';
+      chip.innerHTML = `${b.icon} ${b.name}`;
+      container.appendChild(chip);
+    });
+  }
+
+  return { BADGES, checkAll, getAll, getUnlocked, render, renderRecentBadges };
+})();
+
+</script>
+<script>
+// ════════════════════════════════════════════════════
+//  Forest Quest — charts.js
+//  Trend charts using Chart.js
+// ════════════════════════════════════════════════════
+
+const ChartsModule = (() => {
+
+  let xpChart = null;
+  let tasksChart = null;
+  let categoryChart = null;
+  let streakChart = null;
+  let currentRange = 7;
+
+  const PALETTE = {
+    sage:      '#8fad88',
+    sageFade:  'rgba(143,173,136,.2)',
+    lav:       '#c5b8e3',
+    lavFade:   'rgba(197,184,227,.2)',
+    pink:      '#e8b4b8',
+    pinkFade:  'rgba(232,180,184,.2)',
+    sky:       '#a8d4e6',
+    skyFade:   'rgba(168,212,230,.2)',
+    gold:      '#e8c97a',
+    goldFade:  'rgba(232,201,122,.2)',
+    cream:     '#fdf8f2',
+    text:      '#6b6460'
+  };
+
+  const CAT_COLORS = {
+    Health:      '#8fad88',
+    Learning:    '#a8c4e8',
+    Chores:      '#e8c97a',
+    Fitness:     '#e8a8a8',
+    Creativity:  '#c5b8e3',
+    Social:      '#a8d4e6',
+    Mindfulness: '#c5d8a0',
+    Other:       '#d4c4b0'
+  };
+
+  const defaultOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: 'rgba(255,255,255,.95)',
+        titleColor: '#3a3533',
+        bodyColor: '#6b6460',
+        borderColor: '#e8e0d8',
+        borderWidth: 1.5,
+        padding: 10,
+        cornerRadius: 10,
+        titleFont: { family: 'Quicksand', weight: '700', size: 13 },
+        bodyFont: { family: 'Quicksand', size: 12 }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: {
+          color: PALETTE.text,
+          font: { family: 'Quicksand', size: 11 },
+          maxRotation: 45
+        },
+        border: { color: 'rgba(180,165,150,.2)' }
+      },
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(180,165,150,.12)' },
+        ticks: {
+          color: PALETTE.text,
+          font: { family: 'Quicksand', size: 11 },
+          precision: 0
+        },
+        border: { color: 'rgba(180,165,150,.2)' }
+      }
+    }
+  };
+
+  function formatLabel(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  function buildXPChart(range) {
+    const ctx = document.getElementById('xpChart');
+    if (!ctx) return;
+    const data = FQ.getDailyXP(range);
+    const labels = data.map(d => formatLabel(d.date));
+    const values = data.map(d => d.xp);
+
+    if (xpChart) xpChart.destroy();
+    xpChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'XP Earned',
+          data: values,
+          borderColor: PALETTE.lav,
+          backgroundColor: PALETTE.lavFade,
+          borderWidth: 2.5,
+          pointBackgroundColor: PALETTE.lav,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          tension: .4,
+          fill: true
+        }]
+      },
+      options: {
+        ...defaultOptions,
+        plugins: { ...defaultOptions.plugins, legend: { display: true, labels: { color: PALETTE.text, font: { family: 'Quicksand', size: 12 }, boxWidth: 12, padding: 12 } } }
+      }
+    });
+  }
+
+  function buildTasksChart(range) {
+    const ctx = document.getElementById('tasksChart');
+    if (!ctx) return;
+    const data = FQ.getDailyTaskCount(range);
+    const labels = data.map(d => formatLabel(d.date));
+    const values = data.map(d => d.count);
+
+    if (tasksChart) tasksChart.destroy();
+    tasksChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Tasks Completed',
+          data: values,
+          backgroundColor: values.map(v => v > 0 ? PALETTE.sage : PALETTE.sageFade),
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        ...defaultOptions,
+        plugins: { ...defaultOptions.plugins, legend: { display: true, labels: { color: PALETTE.text, font: { family: 'Quicksand', size: 12 }, boxWidth: 12, padding: 12 } } }
+      }
+    });
+  }
+
+  function buildCategoryChart() {
+    const ctx = document.getElementById('categoryChart');
+    if (!ctx) return;
+    const breakdown = FQ.getCategoryBreakdown();
+    const categories = Object.keys(breakdown);
+    const values = categories.map(c => breakdown[c]);
+    const colors = categories.map(c => CAT_COLORS[c] || PALETTE.sky);
+
+    if (!categories.length) {
+      const parent = ctx.parentElement;
+      ctx.style.display = 'none';
+      if (!parent.querySelector('.empty-chart')) {
+        const em = document.createElement('div');
+        em.className = 'empty-chart empty-state small';
+        em.innerHTML = '<p style="margin:32px 0">Complete quests to see your category breakdown!</p>';
+        parent.appendChild(em);
+      }
+      return;
+    }
+
+    if (categoryChart) categoryChart.destroy();
+    categoryChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: categories.map(c => {
+          const emojis = { Health:'🌿', Learning:'📚', Chores:'🏠', Fitness:'💪', Creativity:'🎨', Social:'💬', Mindfulness:'🧘', Other:'🌟' };
+          return `${emojis[c] || ''} ${c}`;
+        }),
+        datasets: [{
+          data: values,
+          backgroundColor: colors,
+          borderColor: '#fff',
+          borderWidth: 3,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        cutout: '55%',
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: { color: PALETTE.text, font: { family: 'Quicksand', size: 11 }, padding: 12, boxWidth: 14, usePointStyle: true }
+          },
+          tooltip: defaultOptions.plugins.tooltip
+        }
+      }
+    });
+  }
+
+  function buildStreakChart(range) {
+    const ctx = document.getElementById('streakChart');
+    if (!ctx) return;
+    const data = FQ.getStreakHistory(range);
+    const labels = data.map(d => formatLabel(d.date));
+    const values = data.map(d => d.active);
+
+    if (streakChart) streakChart.destroy();
+    streakChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Active Days',
+          data: values,
+          backgroundColor: values.map(v => v > 0 ? PALETTE.pink : 'rgba(232,180,184,.2)'),
+          borderRadius: 4,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        ...defaultOptions,
+        scales: {
+          ...defaultOptions.scales,
+          y: {
+            ...defaultOptions.scales.y,
+            max: 1,
+            ticks: {
+              ...defaultOptions.scales.y.ticks,
+              callback: v => v === 1 ? '✅' : ''
+            }
+          }
+        },
+        plugins: {
+          ...defaultOptions.plugins,
+          legend: { display: true, labels: { color: PALETTE.text, font: { family: 'Quicksand', size: 12 }, boxWidth: 12, padding: 12 } },
+          tooltip: {
+            ...defaultOptions.plugins.tooltip,
+            callbacks: { label: ctx => ctx.raw === 1 ? 'Active day ✅' : 'No activity' }
+          }
+        }
+      }
+    });
+  }
+
+  function buildAll(range) {
+    currentRange = range || currentRange;
+    buildXPChart(currentRange);
+    buildTasksChart(currentRange);
+    buildCategoryChart();
+    buildStreakChart(currentRange);
+    renderSummary();
+  }
+
+  function renderSummary() {
+    const s = FQ.state.stats;
+    const el = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val.toLocaleString(); };
+    el('summaryTotal', s.totalTasksCompleted);
+    el('summaryXP', s.totalXP);
+    el('summaryStreak', s.bestStreak);
+    el('summaryRedeemed', s.totalRewardsRedeemed);
+  }
+
+  // Time range buttons
+  function initRangeButtons() {
+    document.querySelectorAll('.trends-time-filter .filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.trends-time-filter .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        buildAll(parseInt(btn.dataset.range));
+      });
+    });
+  }
+
+  return { buildAll, initRangeButtons };
+})();
+
+</script>
+<script>
+// ════════════════════════════════════════════════════
+//  Forest Quest — app.js
+//  Main application controller
+// ════════════════════════════════════════════════════
+
+(function () {
+  'use strict';
+
+  // ── INIT ──
+  document.addEventListener('DOMContentLoaded', () => {
+    refreshAll();
+    setupNav();
+    setupTaskModal();
+    setupRewardModal();
+    setupRedeemModal();
+    setupSettingsModal();
+    setupMobileMenu();
+    ChartsModule.initRangeButtons();
+    ForestModule.init();
+    setDateDisplay();
+    checkDailyReset();
+  });
+
+  // ════════════════════
+  //  NAV / TABS
+  // ════════════════════
+  function setupNav() {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+    document.querySelectorAll('[data-tab-link]').forEach(el => {
+      el.addEventListener('click', () => switchTab(el.dataset.tabLink));
+    });
+  }
+
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const panel = document.getElementById('tab-' + tabId);
+    const btn = document.querySelector(`[data-tab="${tabId}"]`);
+    if (panel) panel.classList.add('active');
+    if (btn) btn.classList.add('active');
+
+    // Lazy render per tab
+    if (tabId === 'trends') ChartsModule.buildAll();
+    if (tabId === 'forest') ForestModule.refresh();
+    if (tabId === 'achievements') { AchievementsModule.render(); }
+    if (tabId === 'tasks') renderTaskList();
+    if (tabId === 'shop') renderShop();
+
+    // Close mobile sidebar
+    closeMobileSidebar();
+  }
+
+  // ════════════════════
+  //  FULL REFRESH
+  // ════════════════════
+  function refreshAll() {
+    renderDashboard();
+    renderTaskList();
+    renderShop();
+    AchievementsModule.renderRecentBadges();
+  }
+
+  // ════════════════════
+  //  DASHBOARD
+  // ════════════════════
+  function renderDashboard() {
+    const s = FQ.state.stats;
+    const lp = FQ.getLevelProgress();
+
+    setText('dashLevel', s.level);
+    setText('dashXP', s.totalXP.toLocaleString());
+    setText('dashCoins', s.coins.toLocaleString());
+    setText('dashStreak', s.streak);
+    setText('sidebarLevel', s.level);
+    setText('sidebarName', FQ.state.profile.name);
+    setText('sidebarAvatar', FQ.state.profile.avatar);
+    setText('greetName', FQ.state.profile.name);
+    setText('mobileCoins', s.coins.toLocaleString());
+
+    // XP Bar
+    setText('xpBarLevel', s.level);
+    setText('xpBarNext', s.level + 1);
+    setText('xpBarText', `${lp.xpIn.toLocaleString()} / ${lp.xpNeeded.toLocaleString()} XP`);
+    const fill = document.getElementById('xpBarFill');
+    if (fill) {
+      requestAnimationFrame(() => { fill.style.width = lp.pct + '%'; });
+    }
+
+    // Today's list
+    renderTodayList();
+
+    // Streak calendar
+    renderStreakCalendar();
+
+    // Streak count
+    setText('calStreak', s.streak);
+    setText('todayCount', (() => {
+      const done = (FQ.state.completionLog[FQ.today()] || []).length;
+      return `${done} done`;
+    })());
+
+    AchievementsModule.renderRecentBadges();
+  }
+
+  function renderTodayList() {
+    const container = document.getElementById('todayList');
+    if (!container) return;
+    const tasks = FQ.state.tasks;
+    const daily = tasks.filter(t => t.repeat === 'daily' || t.repeat === 'once');
+
+    if (!daily.length) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">🌱</div><p>Add quests to see them here!</p></div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    // Sort: incomplete first, then completed
+    const sorted = [...daily].sort((a, b) => {
+      const aDone = FQ.isTaskDoneToday(a.id) ? 1 : 0;
+      const bDone = FQ.isTaskDoneToday(b.id) ? 1 : 0;
+      return aDone - bDone;
+    });
+
+    sorted.forEach(task => {
+      const done = FQ.isTaskDoneToday(task.id);
+      const item = document.createElement('div');
+      item.className = 'today-item' + (done ? ' done' : '');
+      item.dataset.id = task.id;
+      item.innerHTML = `
+        <div class="today-check">${done ? '✅' : '⬜'}</div>
+        <div class="today-name">${escHtml(task.name)}</div>
+        <div class="today-reward">+${task.xp}xp</div>
+      `;
+      item.addEventListener('click', () => handleCompleteTask(task.id));
+      container.appendChild(item);
+    });
+  }
+
+  function renderStreakCalendar() {
+    const cal = document.getElementById('streakCalendar');
+    if (!cal) return;
+    const days = FQ.getStreakCalendar(28);
+    const todayStr = FQ.today();
+    cal.innerHTML = '';
+    days.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'cal-day' +
+        (d.active ? ' active' : '') +
+        (d.date === todayStr ? ' today-marker' : '') +
+        (d.count > 0 && d.count < 3 ? ' partial' : '');
+      el.title = `${d.date}: ${d.count} tasks`;
+      const dayNum = new Date(d.date + 'T00:00:00').getDate();
+      el.textContent = dayNum;
+      cal.appendChild(el);
+    });
+  }
+
+  function setDateDisplay() {
+    const el = document.getElementById('dateDisplay');
+    if (el) {
+      const opts = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+      el.textContent = new Date().toLocaleDateString('en-US', opts);
+    }
+  }
+
+  // ════════════════════
+  //  TASK COMPLETE FLOW
+  // ════════════════════
+  function handleCompleteTask(taskId) {
+    const alreadyDone = FQ.isTaskDoneToday(taskId);
+
+    if (alreadyDone) {
+      // Toggle uncomplete
+      const task = FQ.uncompleteTask(taskId);
+      if (task) {
+        showToast(`Unmarked: ${task.name}`, '↩️');
+        afterTaskUpdate();
+      }
+    } else {
+      const result = FQ.completeTask(taskId);
+      if (!result) return;
+
+      showToast(`+${result.task.xp} XP, +${result.task.coins} 🪙`, '✨', 'xp');
+
+      // Check achievements
+      const newBadges = AchievementsModule.checkAll();
+      newBadges.forEach((badge, i) => {
+        setTimeout(() => showAchievementFanfare(badge), i * 800);
+      });
+
+      // Level up?
+      if (result.levelUp) {
+        setTimeout(() => showLevelUpFanfare(result.newLevel), newBadges.length * 800 + 400);
+        spawnConfetti();
+      }
+
+      afterTaskUpdate();
+    }
+  }
+
+  function afterTaskUpdate() {
+    renderDashboard();
+    renderTaskList();
+    ForestModule.refresh();
+  }
+
+  // ════════════════════
+  //  TASK LIST
+  // ════════════════════
+  let currentCatFilter = 'all';
+
+  function renderTaskList() {
+    const container = document.getElementById('taskList');
+    if (!container) return;
+    const tasks = FQ.state.tasks;
+    const filtered = currentCatFilter === 'all'
+      ? tasks
+      : tasks.filter(t => t.category === currentCatFilter);
+
+    if (!tasks.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🗺️</div>
+          <h3>Your adventure awaits!</h3>
+          <p>Create your first quest to start earning XP and coins.</p>
+          <button class="btn btn-primary" id="openAddTaskEmpty">+ Create First Quest</button>
+        </div>`;
+      document.getElementById('openAddTaskEmpty')?.addEventListener('click', openAddTask);
+      return;
+    }
+
+    if (!filtered.length) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p>No quests in this category yet.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = '';
+    // Sort: incomplete today first
+    const sorted = [...filtered].sort((a, b) => {
+      const aDone = FQ.isTaskDoneToday(a.id) ? 1 : 0;
+      const bDone = FQ.isTaskDoneToday(b.id) ? 1 : 0;
+      return aDone - bDone;
+    });
+
+    sorted.forEach(task => {
+      const done = FQ.isTaskDoneToday(task.id);
+      const card = document.createElement('div');
+      card.className = 'task-card' + (done ? ' completed-today' : '');
+      card.innerHTML = `
+        <button class="task-complete-btn" aria-label="${done ? 'Undo complete' : 'Complete quest'}">${done ? '✅' : ''}</button>
+        <div class="task-info">
+          <div class="task-name">${escHtml(task.name)}</div>
+          <div class="task-meta">
+            <span class="task-cat cat-${task.category}">${catEmoji(task.category)} ${task.category}</span>
+            <span class="task-reward-badge">✨ +${task.xp} XP</span>
+            <span class="task-reward-badge">🪙 +${task.coins}</span>
+            <span class="task-repeat-badge">${task.repeat}</span>
+          </div>
+        </div>
+        <button class="task-edit-btn" aria-label="Edit quest">✏️</button>
+      `;
+      card.querySelector('.task-complete-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleCompleteTask(task.id);
+      });
+      card.querySelector('.task-edit-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openEditTask(task);
+      });
+      card.addEventListener('click', () => handleCompleteTask(task.id));
+      container.appendChild(card);
+    });
+  }
+
+  // Category filter setup
+  document.getElementById('categoryFilter')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    document.querySelectorAll('#categoryFilter .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCatFilter = btn.dataset.cat;
+    renderTaskList();
+  });
+
+  // ════════════════════
+  //  TASK MODAL
+  // ════════════════════
+  let editingTaskId = null;
+
+  function setupTaskModal() {
+    document.getElementById('openAddTask')?.addEventListener('click', openAddTask);
+    document.getElementById('quickAddBtn')?.addEventListener('click', () => { switchTab('tasks'); openAddTask(); });
+    document.getElementById('closeTaskModal')?.addEventListener('click', closeTaskModal);
+    document.getElementById('cancelTaskModal')?.addEventListener('click', closeTaskModal);
+    document.getElementById('saveTask')?.addEventListener('click', saveTask);
+    document.getElementById('deleteTaskBtn')?.addEventListener('click', () => {
+      if (editingTaskId && confirm('Delete this quest?')) {
+        FQ.deleteTask(editingTaskId);
+        closeTaskModal();
+        refreshAll();
+        showToast('Quest deleted', '🗑️');
+      }
+    });
+    document.getElementById('taskModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'taskModal') closeTaskModal();
+    });
+  }
+
+  function openAddTask() {
+    editingTaskId = null;
+    setText('taskModalTitle', 'New Quest');
+    document.getElementById('taskName').value = '';
+    document.getElementById('taskCategory').value = 'Health';
+    document.getElementById('taskXP').value = '10';
+    document.getElementById('taskCoins').value = '5';
+    document.getElementById('taskRepeat').value = 'daily';
+    document.getElementById('taskNotes').value = '';
+    document.getElementById('deleteTaskBtn').style.display = 'none';
+    openModal('taskModal');
+  }
+
+  function openEditTask(task) {
+    editingTaskId = task.id;
+    setText('taskModalTitle', 'Edit Quest');
+    document.getElementById('taskName').value = task.name;
+    document.getElementById('taskCategory').value = task.category;
+    document.getElementById('taskXP').value = task.xp;
+    document.getElementById('taskCoins').value = task.coins;
+    document.getElementById('taskRepeat').value = task.repeat;
+    document.getElementById('taskNotes').value = task.notes || '';
+    document.getElementById('deleteTaskBtn').style.display = 'block';
+    openModal('taskModal');
+  }
+
+  function closeTaskModal() { closeModal('taskModal'); }
+
+  function saveTask() {
+    const name = document.getElementById('taskName').value.trim();
+    if (!name) { shakeInput('taskName'); return; }
+    const data = {
+      name,
+      category: document.getElementById('taskCategory').value,
+      xp: document.getElementById('taskXP').value,
+      coins: document.getElementById('taskCoins').value,
+      repeat: document.getElementById('taskRepeat').value,
+      notes: document.getElementById('taskNotes').value
+    };
+    if (editingTaskId) {
+      FQ.updateTask(editingTaskId, data);
+      showToast('Quest updated! ✨');
+    } else {
+      FQ.addTask(data);
+      showToast('New quest added! 🌱');
+    }
+    closeTaskModal();
+    refreshAll();
+  }
+
+  // ════════════════════
+  //  REWARD MODAL
+  // ════════════════════
+  let editingRewardId = null;
+
+  function setupRewardModal() {
+    document.getElementById('openAddReward')?.addEventListener('click', openAddReward);
+    document.getElementById('openAddRewardEmpty')?.addEventListener('click', openAddReward);
+    document.getElementById('closeRewardModal')?.addEventListener('click', closeRewardModal);
+    document.getElementById('cancelRewardModal')?.addEventListener('click', closeRewardModal);
+    document.getElementById('saveReward')?.addEventListener('click', saveReward);
+    document.getElementById('deleteRewardBtn')?.addEventListener('click', () => {
+      if (editingRewardId && confirm('Delete this reward?')) {
+        FQ.deleteReward(editingRewardId);
+        closeRewardModal();
+        renderShop();
+        showToast('Reward deleted', '🗑️');
+      }
+    });
+    document.getElementById('rewardModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'rewardModal') closeRewardModal();
+    });
+  }
+
+  function openAddReward() {
+    editingRewardId = null;
+    setText('rewardModalTitle', 'New Reward');
+    document.getElementById('rewardName').value = '';
+    document.getElementById('rewardDesc').value = '';
+    document.getElementById('rewardIcon').value = '🎁';
+    document.getElementById('rewardCost').value = '50';
+    document.getElementById('deleteRewardBtn').style.display = 'none';
+    openModal('rewardModal');
+  }
+
+  function openEditReward(reward) {
+    editingRewardId = reward.id;
+    setText('rewardModalTitle', 'Edit Reward');
+    document.getElementById('rewardName').value = reward.name;
+    document.getElementById('rewardDesc').value = reward.desc || '';
+    document.getElementById('rewardIcon').value = reward.icon || '🎁';
+    document.getElementById('rewardCost').value = reward.cost;
+    document.getElementById('deleteRewardBtn').style.display = 'block';
+    openModal('rewardModal');
+  }
+
+  function closeRewardModal() { closeModal('rewardModal'); }
+
+  function saveReward() {
+    const name = document.getElementById('rewardName').value.trim();
+    if (!name) { shakeInput('rewardName'); return; }
+    const data = {
+      name,
+      desc: document.getElementById('rewardDesc').value.trim(),
+      icon: document.getElementById('rewardIcon').value.trim() || '🎁',
+      cost: document.getElementById('rewardCost').value
+    };
+    if (editingRewardId) {
+      FQ.updateReward(editingRewardId, data);
+      showToast('Reward updated! ✨');
+    } else {
+      FQ.addReward(data);
+      showToast('Reward added! 🎁');
+    }
+    closeRewardModal();
+    renderShop();
+  }
+
+  // ════════════════════
+  //  SHOP
+  // ════════════════════
+  function renderShop() {
+    const container = document.getElementById('rewardList');
+    if (!container) return;
+    const coins = FQ.state.stats.coins;
+    setText('shopCoins', coins.toLocaleString());
+    setText('mobileCoins', coins.toLocaleString());
+
+    const rewards = FQ.state.rewards;
+
+    if (!rewards.length) {
+      container.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-icon">🎁</div>
+          <h3>Build your reward shelf!</h3>
+          <p>Add things you love — candy, game time, a movie night.</p>
+          <button class="btn btn-primary" id="openAddRewardEmpty2">+ Add First Reward</button>
+        </div>`;
+      document.getElementById('openAddRewardEmpty2')?.addEventListener('click', openAddReward);
+      return;
+    }
+
+    container.innerHTML = '';
+    rewards.forEach(r => {
+      const canAfford = coins >= r.cost;
+      const card = document.createElement('div');
+      card.className = 'reward-card';
+      card.innerHTML = `
+        <button class="reward-edit-btn" aria-label="Edit">✏️</button>
+        <div class="reward-icon-large">${r.icon || '🎁'}</div>
+        <div class="reward-name">${escHtml(r.name)}</div>
+        ${r.desc ? `<div class="reward-desc-text">${escHtml(r.desc)}</div>` : ''}
+        <div class="reward-cost-badge">🪙 ${r.cost} coins</div>
+        <button class="btn btn-primary btn-sm" ${canAfford ? '' : 'disabled style="opacity:.5;cursor:not-allowed"'}>
+          ${canAfford ? 'Redeem 🎉' : 'Need more coins'}
+        </button>
+      `;
+      card.querySelector('.reward-edit-btn').addEventListener('click', () => openEditReward(r));
+      const redeemBtn = card.querySelector('.btn-primary');
+      if (canAfford) {
+        redeemBtn.addEventListener('click', () => openRedeemModal(r));
+      }
+      container.appendChild(card);
+    });
+
+    // Redemption history
+    const log = FQ.state.redeemLog;
+    const histCard = document.getElementById('redemptionHistoryCard');
+    const histList = document.getElementById('redemptionList');
+    if (histCard && histList) {
+      if (log.length) {
+        histCard.style.display = 'block';
+        histList.innerHTML = '';
+        [...log].reverse().slice(0, 20).forEach(entry => {
+          const item = document.createElement('div');
+          item.className = 'redemption-item';
+          item.innerHTML = `
+            <div class="redemption-icon">${entry.icon || '🎁'}</div>
+            <div class="redemption-info">
+              <div class="redemption-name">${escHtml(entry.name)}</div>
+              <div class="redemption-date">${FQ.formatDate(entry.date)}</div>
+            </div>
+            <div class="redemption-cost">-${entry.cost} 🪙</div>
+          `;
+          histList.appendChild(item);
+        });
+      } else {
+        histCard.style.display = 'none';
+      }
+    }
+  }
+
+  // ════════════════════
+  //  REDEEM MODAL
+  // ════════════════════
+  let redeemTargetId = null;
+
+  function setupRedeemModal() {
+    document.getElementById('closeRedeemModal')?.addEventListener('click', () => closeModal('redeemModal'));
+    document.getElementById('cancelRedeem')?.addEventListener('click', () => closeModal('redeemModal'));
+    document.getElementById('confirmRedeem')?.addEventListener('click', confirmRedeem);
+    document.getElementById('redeemModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'redeemModal') closeModal('redeemModal');
+    });
+  }
+
+  function openRedeemModal(reward) {
+    redeemTargetId = reward.id;
+    setText('redeemIcon', reward.icon || '🎁');
+    setText('redeemName', reward.name);
+    setText('redeemCost', reward.cost + ' coins');
+    setText('redeemBalance', `You have ${FQ.state.stats.coins} coins. After: ${FQ.state.stats.coins - reward.cost} coins.`);
+    openModal('redeemModal');
+  }
+
+  function confirmRedeem() {
+    const result = FQ.redeemReward(redeemTargetId);
+    closeModal('redeemModal');
+    if (result.ok) {
+      showToast(`Enjoyed: ${result.reward.name} 🎉`, result.reward.icon, 'coin');
+      spawnConfetti();
+      renderDashboard();
+      renderShop();
+      const newBadges = AchievementsModule.checkAll();
+      newBadges.forEach((badge, i) => {
+        setTimeout(() => showAchievementFanfare(badge), i * 800 + 300);
+      });
+    } else {
+      showToast(result.reason, '❌', 'error');
+    }
+  }
+
+  // ════════════════════
+  //  SETTINGS MODAL
+  // ════════════════════
+  function setupSettingsModal() {
+    document.getElementById('openSettings')?.addEventListener('click', openSettings);
+    document.getElementById('closeSettings')?.addEventListener('click', () => closeModal('settingsModal'));
+    document.getElementById('saveSettings')?.addEventListener('click', saveSettings);
+    document.getElementById('settingsModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'settingsModal') closeModal('settingsModal');
+    });
+    document.getElementById('exportDataBtn')?.addEventListener('click', () => { FQ.exportData(); showToast('Data exported! 📥'); });
+    document.getElementById('importDataBtn')?.addEventListener('click', () => document.getElementById('importFileInput').click());
+    document.getElementById('importFileInput')?.addEventListener('change', handleImport);
+    document.getElementById('resetDataBtn')?.addEventListener('click', () => {
+      if (confirm('Reset ALL data? This cannot be undone.')) {
+        FQ.resetData();
+        refreshAll();
+        ForestModule.refresh();
+        AchievementsModule.render();
+        closeModal('settingsModal');
+        showToast('Data reset. Fresh start! 🌱');
+      }
+    });
+
+    document.getElementById('avatarPicker')?.addEventListener('click', (e) => {
+      const opt = e.target.closest('.avatar-opt');
+      if (!opt) return;
+      document.querySelectorAll('.avatar-opt').forEach(b => b.classList.remove('selected'));
+      opt.classList.add('selected');
+    });
+  }
+
+  function openSettings() {
+    document.getElementById('settingsName').value = FQ.state.profile.name;
+    document.querySelectorAll('.avatar-opt').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.av === FQ.state.profile.avatar);
+    });
+    openModal('settingsModal');
+  }
+
+  function saveSettings() {
+    const name = document.getElementById('settingsName').value.trim() || 'Adventurer';
+    const selected = document.querySelector('.avatar-opt.selected');
+    const avatar = selected ? selected.dataset.av : FQ.state.profile.avatar;
+    FQ.state.profile.name = name;
+    FQ.state.profile.avatar = avatar;
+    FQ.save();
+    closeModal('settingsModal');
+    renderDashboard();
+    showToast('Settings saved! ✨');
+  }
+
+  function handleImport(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        FQ.importData(ev.target.result);
+        refreshAll();
+        ForestModule.refresh();
+        AchievementsModule.render();
+        closeModal('settingsModal');
+        showToast('Data imported! 🎉');
+      } catch (err) {
+        showToast('Import failed — invalid file', '❌', 'error');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
+
+  // ════════════════════
+  //  MOBILE SIDEBAR
+  // ════════════════════
+  function setupMobileMenu() {
+    document.getElementById('hamburger')?.addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('mobile-open');
+      document.getElementById('sidebarOverlay').classList.toggle('show');
+    });
+    document.getElementById('sidebarOverlay')?.addEventListener('click', closeMobileSidebar);
+  }
+
+  function closeMobileSidebar() {
+    document.getElementById('sidebar')?.classList.remove('mobile-open');
+    document.getElementById('sidebarOverlay')?.classList.remove('show');
+  }
+
+  // ════════════════════
+  //  FANFARES & TOASTS
+  // ════════════════════
+  function showAchievementFanfare(badge) {
+    const el = document.getElementById('achievementFanfare');
+    if (!el) return;
+    document.getElementById('fanfareIcon').textContent = badge.icon;
+    document.getElementById('fanfareName').textContent = badge.name;
+    el.style.display = 'flex';
+    spawnConfetti();
+    setTimeout(() => { el.style.display = 'none'; }, 2600);
+  }
+
+  function showLevelUpFanfare(level) {
+    const el = document.getElementById('levelupFanfare');
+    if (!el) return;
+    document.getElementById('levelupName').textContent = `You reached Level ${level}!`;
+    el.style.display = 'flex';
+    spawnConfetti();
+    setTimeout(() => { el.style.display = 'none'; }, 2600);
+  }
+
+  let toastQueue = [];
+  function showToast(message, icon = '🌟', type = '') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast' + (type ? ` toast-${type}` : '');
+    toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('removing');
+      setTimeout(() => toast.remove(), 350);
+    }, 2800);
+  }
+
+  function spawnConfetti() {
+    const colors = ['#8fad88','#e8b4b8','#c5b8e3','#a8d4e6','#e8c97a','#f5dde0'];
+    for (let i = 0; i < 42; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'confetti-particle';
+      particle.style.cssText = `
+        left: ${10 + Math.random() * 80}%;
+        top: -20px;
+        background: ${colors[Math.floor(Math.random() * colors.length)]};
+        width: ${6 + Math.random() * 8}px;
+        height: ${6 + Math.random() * 8}px;
+        border-radius: ${Math.random() > .5 ? '50%' : '2px'};
+        animation-duration: ${0.9 + Math.random() * 1.4}s;
+        animation-delay: ${Math.random() * 0.4}s;
+      `;
+      document.body.appendChild(particle);
+      setTimeout(() => particle.remove(), 2400);
+    }
+  }
+
+  // ════════════════════
+  //  DAILY RESET
+  // ════════════════════
+  function checkDailyReset() {
+    // One-time daily quests: already handled by checking completion log per day
+    // Weekly tasks reset on week boundary
+    const today = FQ.today();
+    const lastActive = FQ.state.stats.lastActiveDate;
+    if (!lastActive) {
+      FQ.state.stats.lastActiveDate = today;
+      FQ.save();
+    }
+  }
+
+  // ════════════════════
+  //  HELPERS
+  // ════════════════════
+  function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('open');
+  }
+
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('open');
+  }
+
+  function setText(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function shakeInput(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.animation = 'none';
+    el.style.borderColor = 'var(--danger)';
+    el.focus();
+    setTimeout(() => el.style.borderColor = '', 1200);
+  }
+
+  function catEmoji(cat) {
+    const m = { Health:'🌿', Learning:'📚', Chores:'🏠', Fitness:'💪', Creativity:'🎨', Social:'💬', Mindfulness:'🧘', Other:'🌟' };
+    return m[cat] || '🌟';
+  }
+
+})();
+
+</script>
+</body>
+</html>
